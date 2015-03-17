@@ -63,7 +63,7 @@ object svdr extends UFunc {
 
     val _u = Q * w2
 
-    val (u, v) = Helpers.flipSVDSigns(_u, _v)
+    val (u, v) = utils.flipSVDSigns(_u, _v)
 
     SVD(u(::, 0 until k), _s(0 until k), v(0 until k, ::))
   }

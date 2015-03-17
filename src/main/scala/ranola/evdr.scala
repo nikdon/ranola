@@ -5,7 +5,7 @@ import breeze.linalg._
 import breeze.linalg.eig.Eig
 import breeze.linalg.eigSym.{DenseEigSym, EigSym}
 import breeze.numerics._
-import ranola.Helpers._
+import ranola.utils._
 
 
 /**
@@ -63,7 +63,7 @@ object evdr extends UFunc {
 
     val _u = Q * v
 
-    val u = Helpers.flipSigns(_u)
+    val u = utils.flipSigns(_u)
 
     EigSym(w, u)
   }
