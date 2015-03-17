@@ -5,7 +5,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.util.DoubleImplicits
 import org.scalatest._
 
-object utils extends FunSuite with Matchers with DoubleImplicits {
+object TestHelpers extends FunSuite with Matchers with DoubleImplicits {
 
   def vectorsNearlyEqual(A: DenseVector[Double], B: DenseVector[Double], threshold: Double = 1E-6) {
     for(i <- 0 until A.length)

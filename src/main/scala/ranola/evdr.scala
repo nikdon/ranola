@@ -5,7 +5,7 @@ import breeze.linalg._
 import breeze.linalg.eig.Eig
 import breeze.linalg.eigSym.{DenseEigSym, EigSym}
 import breeze.numerics._
-import breeze.stats.distributions.Rand
+import ranola.Helpers._
 
 
 /**
@@ -55,7 +55,7 @@ object evdr extends UFunc {
 
     val nRandom = s + nOversamples
 
-    val Q = randomizedStateFinder(M, nRandom, nIter)
+    val Q = RandomizedRangeFinder.powerIteration(M, nRandom, nIter)
 
     val b = Q.t * (M * Q)
 
@@ -63,48 +63,10 @@ object evdr extends UFunc {
 
     val _u = Q * v
 
-    val u = flipSigns(_u)
+    val u = Helpers.flipSigns(_u)
 
     EigSym(w, u)
   }
 
-  /**
-   * Computes an orthonormal matrix whose range approximates the range of M
-   *
-   * @param M The input data matrix
-   * @param size Size of the matrix to return
-   * @param nIter Number of power iterations used to stabilize the result
-   * @return A size-by-size projection matrix Q
-   *
-   * ==Notes==
-   *
-   * Algorithm 4.3 of "Finding structure with randomness:
-   * Stochastic algorithms for constructing approximate matrix decompositions"
-   * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
-   */
-  private def randomizedStateFinder(M: DenseMatrix[Double],
-                                    size: Int,
-                                    nIter: Int): DenseMatrix[Double] = {
-    val R = DenseMatrix.rand(M.cols, size, rand = Rand.gaussian)
-    val Y = M * R
-    for (a <- 0 until nIter) Y := M * (M.t * Y)
-    val q = qr.reduced.justQ(Y)
-    q
-  }
 
-  /**
-   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive
-   *
-   * @param u eigenvectors
-   * @return eigenvectors with resolved sign ambiguity
-   */
-  private def flipSigns(u: DenseMatrix[Double]): DenseMatrix[Double] = {
-    val abs_u = abs(u)
-    val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
-    val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(s => {
-      u(::, s._2) :*= s._1
-    })
-    u
-  }
 }

@@ -9,7 +9,7 @@ import breeze.linalg._
 import breeze.util.DoubleImplicits
 import org.junit.runner.RunWith
 
-import ranola.utils._
+import ranola.TestHelpers._
 
 
 @RunWith(classOf[JUnitRunner])
