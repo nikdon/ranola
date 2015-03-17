@@ -3,8 +3,6 @@ package ranola
 import breeze.generic.UFunc
 import breeze.linalg._
 import breeze.linalg.svd.{DenseSVD, SVD}
-import breeze.numerics.{abs, signum}
-import breeze.stats.distributions.Rand
 
 
 /**
@@ -55,7 +53,7 @@ object svdr extends UFunc {
 
     val nRandom = k + nOversamples
 
-    val Q = RandomizedRangeFinder.powerIteration(M, nRandom, nIter)
+    val Q = PowerIteration(M, nRandom, nIter)
 
     val b = Q.t * M
 
