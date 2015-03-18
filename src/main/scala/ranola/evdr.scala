@@ -1,9 +1,9 @@
 package ranola
 
 
-import breeze.linalg._
 import breeze.linalg.eig.Eig
 import breeze.linalg.eigSym.{DenseEigSym, EigSym}
+import breeze.linalg.{DenseMatrix, eig}
 
 
 /**

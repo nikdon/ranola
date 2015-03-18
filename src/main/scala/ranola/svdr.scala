@@ -1,8 +1,8 @@
 package ranola
 
 
-import breeze.linalg._
 import breeze.linalg.svd.{DenseSVD, SVD}
+import breeze.linalg.{DenseMatrix, svd}
 
 
 /**
