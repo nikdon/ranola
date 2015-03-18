@@ -13,10 +13,14 @@ import breeze.linalg.{DenseMatrix, eig}
 object evdr {
 
   def apply(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
+    doEvdr(M, Q, k)
+  }
+
+  private def doEvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
     val b = Q.t * (M * Q)
     val Eig(w, _, v) = eig(b)
     val _u = Q * v
-    val u = utils.flipSigns(_u)
+    val u = utils.flipEVDSigns(_u)
     EigSym(w(0 until k), u(::, 0 until k))
   }
 }

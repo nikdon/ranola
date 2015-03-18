@@ -12,6 +12,10 @@ import breeze.linalg.{DenseMatrix, svd}
 object svdr {
 
   def apply(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseSVD = {
+    doSvdr(M, Q, k)
+  }
+
+  private def doSvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseSVD = {
     val b = Q.t * M
     val SVD(w2, _s, _v) = svd.reduced(b)
     val _u = Q * w2

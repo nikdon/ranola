@@ -23,7 +23,13 @@ object RandomizedRangeFinder {
   def powerIteration(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
     val R = DenseMatrix.rand(M.cols, sketchSize, rand = Rand.gaussian)
     val Y = M * R
-    for (a <- 0 until nIter) Y := M * (M.t * Y)
+
+    var a = 0
+    while (a < nIter) {
+      Y := M * (M.t * Y)
+      a += 1
+    }
+
     val q = qr.reduced.justQ(Y)
     q
   }

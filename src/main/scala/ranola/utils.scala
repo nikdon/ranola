@@ -1,30 +1,34 @@
 package ranola
 
 
-import breeze.linalg.{argmax, DenseMatrix}
-import breeze.numerics._
+import breeze.linalg.{DenseMatrix, argmax}
+import breeze.numerics.{abs, signum}
 
 
 object utils {
 
   /**
-   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive
+   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive.
+   * Applicable for EVD.
    *
    * @param u eigenvectors
    * @return eigenvectors with resolved sign ambiguity
    */
-  def flipSigns(u: DenseMatrix[Double]): DenseMatrix[Double] = {
+  def flipEVDSigns(u: DenseMatrix[Double]): DenseMatrix[Double] = {
     val abs_u = abs(u)
-    val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
-    val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(s => {
-      u(::, s._2) :*= s._1
-    })
+    val len = u.cols
+    var i = 0
+    while (i < len) {
+      u(::, i) :*= signum(u(argmax(abs_u(::, i)), i))
+      i += 1
+    }
+
     u
   }
 
   /**
-   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive
+   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive.
+   * Applicable for SVD.
    *
    * @param u left singular vectors
    * @param v right singular vectors
@@ -33,12 +37,15 @@ object utils {
   def flipSVDSigns(u: DenseMatrix[Double],
                    v: DenseMatrix[Double]): (DenseMatrix[Double], DenseMatrix[Double]) = {
     val abs_u = abs(u)
-    val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
-    val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(s => {
-      u(::, s._2) :*= s._1
-      v(s._2, ::) :*= s._1
-    })
+    val len = u.cols
+    var i = 0
+    while (i < len) {
+      val sign = signum(u(argmax(abs_u(::, i)), i))
+      u(::, i) :*= sign
+      v(i, ::) :*= sign
+      i += 1
+    }
+
     (u, v)
   }
 
