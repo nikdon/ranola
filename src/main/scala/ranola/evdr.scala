@@ -17,6 +17,8 @@ object evdr {
   }
 
   private def doEvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
+    require(k <= Q.cols, "Number of columns Q should be less or equal to k")
+
     val b = Q.t * (M * Q)
     val Eig(w, _, v) = eig(b)
     val _u = Q * v

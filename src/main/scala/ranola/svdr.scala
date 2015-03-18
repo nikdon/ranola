@@ -16,6 +16,8 @@ object svdr {
   }
 
   private def doSvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseSVD = {
+    require(k <= Q.cols, "Number of columns Q should be less or equal to k")
+
     val b = Q.t * M
     val SVD(w2, _s, _v) = svd.reduced(b)
     val _u = Q * w2
