@@ -27,7 +27,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     for (m <- List(a, a.t)) {
       val SVD(u, s, v) = svd.reduced(m)
-      val SVD(ur, sr, vr) = svdr(m, m.rows min m.cols)
+      val SVD(ur, sr, vr) = svdr(m, RandomizedRangeFinder.generic(m), m.rows min m.cols)
 
       vectorsNearlyEqual(s, sr)
       matricesNearlyEqual(abs(u), abs(ur))
@@ -45,7 +45,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
       (0.0, 7.0, 0.0)
     ).t
 
-    val SVD(u, sr, vt) = svdr(m, m.rows min m.cols)
+    val SVD(u, sr, vt) = svdr(m, RandomizedRangeFinder.generic(m), m.rows min m.cols)
 
     val reM = u * diag(sr) * vt
     matricesNearlyEqual(reM, m)
@@ -61,7 +61,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
       (0.0, 7.0, 0.0)
     )
 
-    val SVD(u, sr, vt) = svdr(m, m.rows min m.cols)
+    val SVD(u, sr, vt) = svdr(m, RandomizedRangeFinder.generic(m), m.rows min m.cols)
 
     val reM = u * diag(sr) * vt
     matricesNearlyEqual(reM, m)

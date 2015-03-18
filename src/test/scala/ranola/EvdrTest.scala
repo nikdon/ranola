@@ -18,7 +18,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     val eigVals = DenseVector(9.0,25.0,82.0)
     val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
-    val EigSym(lambda, evs) = evdr.generic(A, k = 3, nOversamples = 10)
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.generic(A), k = 3)
 
     val idx = argsort(lambda)
 
@@ -33,7 +33,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     val eigVals = DenseVector(9.0,25.0,82.0)
     val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
-    val EigSym(lambda, evs) = evdr.powerIteration(A, k = 3, nOversamples = 10, nIter = 2)
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.powerIteration(A), k = 3)
 
     val idx = argsort(lambda)
 
