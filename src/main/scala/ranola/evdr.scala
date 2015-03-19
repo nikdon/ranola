@@ -3,7 +3,7 @@ package ranola
 
 import breeze.linalg.eig.Eig
 import breeze.linalg.eigSym.{DenseEigSym, EigSym}
-import breeze.linalg.{DenseMatrix, eig}
+import breeze.linalg.{DenseMatrix, eig, min}
 
 
 /**
@@ -17,7 +17,7 @@ object evdr {
   }
 
   private def doEvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
-    require(k <= Q.cols, "Number of columns Q should be less or equal to k")
+    require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
     val b = Q.t * (M * Q)
     val Eig(w, _, v) = eig(b)

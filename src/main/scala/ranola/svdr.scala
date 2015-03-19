@@ -2,7 +2,7 @@ package ranola
 
 
 import breeze.linalg.svd.{DenseSVD, SVD}
-import breeze.linalg.{DenseMatrix, svd}
+import breeze.linalg.{DenseMatrix, min, svd}
 
 
 /**
@@ -16,7 +16,7 @@ object svdr {
   }
 
   private def doSvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseSVD = {
-    require(k <= Q.cols, "Number of columns Q should be less or equal to k")
+    require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
     val b = Q.t * M
     val SVD(w2, _s, _v) = svd.reduced(b)
