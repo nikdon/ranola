@@ -18,7 +18,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     val eigVals = DenseVector(9.0,25.0,82.0)
     val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
-    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.generic(A), k = 3)
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.generic(A, sketchSize = 3), k = 3)
 
     val idx = argsort(lambda)
 
@@ -28,12 +28,27 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("EVDR with Power Iterator Randomized Range Finder") {
+  test("EVDR with Power Iteration Randomized Range Finder") {
     val A = DenseMatrix((9.0, 0.0, 0.0), (0.0, 82.0, 0.0), (0.0, 0.0, 25.0))
     val eigVals = DenseVector(9.0,25.0,82.0)
     val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
-    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.powerIteration(A), k = 3)
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.powerIteration(A, sketchSize = 3), k = 3)
+
+    val idx = argsort(lambda)
+
+    idx.zipWithIndex.map{ i =>
+      lambda(i._1) should be (eigVals(i._2) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    }
+  }
+
+  test("EVDR with Subspace Iteration Randomized Range Finder") {
+    val A = DenseMatrix((9.0, 0.0, 0.0), (0.0, 82.0, 0.0), (0.0, 0.0, 25.0))
+    val eigVals = DenseVector(9.0,25.0,82.0)
+    val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
+
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.subspaceIteration(A, sketchSize = 3), k = 3)
 
     val idx = argsort(lambda)
 
