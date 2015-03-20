@@ -11,6 +11,10 @@ import breeze.stats.distributions.Rand
  */
 object RandomizedRangeFinder {
 
+  /////////////////////////////////////////////////////////
+  // Implementation of algorithms
+  /////////////////////////////////////////////////////////
+
   private val DEFAULT_N_ITER = 10
 
   /**
@@ -122,17 +126,6 @@ object RandomizedRangeFinder {
     Q
   }
 
-  private def maxNorm(y: Array[DenseVector[Double]]): Double = {
-    val len = y.length
-    val norms = new Array[Double](len)
-    var i = 0
-    while (i < len) {
-      norms(i) = norm(y(i))
-      i += 1
-    }
-    max(norms)
-  }
-
   /**
    * Algorithm 4.4 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -164,6 +157,31 @@ object RandomizedRangeFinder {
   }
 
   /**
+   * Algorithm 4.5 of "Finding structure with randomness:
+   * Stochastic algorithms for constructing approximate matrix decompositions"
+   * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
+   *
+   * @param M The input data matrix
+   * @param sketchSize Size of the matrix to return
+   * @return A size-by-size projection matrix Q
+   */
+  def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+    val (m, n) = (M.rows, M.cols)
+    val D = ???     // Diagonal matrix with complex var uniformly distributed on complex unit circle
+    val F = ???     // DFT matrix
+    val R = ???     // Matrix with random columns of the I
+    val SRFT = ???  // sqrt(n / sketchSize) * D * F * R
+    val Y = ???     // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
+    val q = ???     // qr.reduced.justQ(Y)
+    ???             // q
+  }
+
+
+  ///////////////////////////////////////
+  // Helpers
+  ///////////////////////////////////////
+
+  /**
    * Draw random matrix
    *
    * @param M Matrix
@@ -185,6 +203,23 @@ object RandomizedRangeFinder {
   private def checkAndGetSketchSize(M: DenseMatrix[Double], s: Int): Int = {
     if (s > M.rows) M.rows
     else s
+  }
+
+  /**
+   * Maximum of DenseVector norms in the array
+   *
+   * @param y Array contained DenseVectors
+   * @return Maximum norm of the given array
+   */
+  private def maxNorm(y: Array[DenseVector[Double]]): Double = {
+    val len = y.length
+    val norms = new Array[Double](len)
+    var i = 0
+    while (i < len) {
+      norms(i) = norm(y(i))
+      i += 1
+    }
+    max(norms)
   }
 
 }
