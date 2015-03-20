@@ -1,7 +1,8 @@
 package ranola
 
 
-import breeze.linalg.{DenseMatrix, qr}
+import breeze.linalg._
+import breeze.numerics.sqrt
 import breeze.stats.distributions.Rand
 
 
@@ -51,6 +52,85 @@ object RandomizedRangeFinder {
    */
   def generic(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     powerIteration(M, sketchSize, 0)
+  }
+
+  /**
+   * Algorithm 4.2 of "Finding structure with randomness:
+   * Stochastic algorithms for constructing approximate matrix decompositions"
+   * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
+   *
+   * @param M The input data matrix
+   * @param nRandVec Number of random vectors
+   * @param tolerance Tolerance
+   * @param maxIter Max number of iterations
+   * @return
+   */
+  def adaptive(M: DenseMatrix[Double], nRandVec: Int, tolerance: Double, maxIter: Int): DenseMatrix[Double] = {
+    require(nRandVec > 1, "Number of random vectors should be greater than 1")
+
+    val (m, n) = (M.rows, M.cols)
+    val threshold = tolerance / (10 * sqrt(2 / Math.PI))
+
+    var W = new Array[DenseVector[Double]](nRandVec)
+    var Y = new Array[DenseVector[Double]](nRandVec)
+    var Q = DenseMatrix.create[Double](m, 0, new Array(0))
+
+    // Helpers
+    var i, j, k = 0
+    val y = DenseVector.zeros[Double](m)
+    val q = DenseVector.zeros[Double](m)
+    val w = DenseVector.zeros[Double](n)
+    val tmp = DenseVector.zeros[Double](m)
+
+    // Fill W and Y arrays
+    i = 0
+    while (i < nRandVec) {
+      W(i) = DenseVector.rand(n, rand = Rand.gaussian)
+      Y(i) = M * W(i)
+      i += 1
+    }
+
+    // Main loop
+    i = 0
+    j = 0
+    while (maxNorm(Y) > threshold && i < maxIter) {
+      j += 1
+
+      y := Y(j) - Q * (Q.t * Y(j))
+      q := (y / norm(y))
+
+      if (i == 0) Q = q.toDenseMatrix.t
+      else Q = DenseMatrix.horzcat(Q, q.asDenseMatrix.t)
+
+      w := DenseVector.rand(n, rand = Rand.gaussian)
+      tmp := M * w
+      y := tmp - Q * (Q.t * tmp)
+
+      W :+= w
+      Y :+= y
+
+      // Overwrite Y
+      k = j + 1
+      while (k < j + nRandVec) {
+        Y(i) = Y(i) - (q.t * Y(i)) * q
+        k += 1
+      }
+
+      i += 1
+    }
+
+    Q
+  }
+
+  private def maxNorm(y: Array[DenseVector[Double]]): Double = {
+    val len = y.length
+    val norms = new Array[Double](len)
+    var i = 0
+    while (i < len) {
+      norms(i) = norm(y(i))
+      i += 1
+    }
+    max(norms)
   }
 
   /**
