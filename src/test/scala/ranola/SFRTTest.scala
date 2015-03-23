@@ -14,8 +14,17 @@ import ranola.RandomizedRangeFinder._
 class SFRTTest extends FunSuite with Matchers with DoubleImplicits {
 
   test("F Matrix") {
-
     val matF = F(3)
+    println(matF)
+  }
 
+  test("D Matrix") {
+    val matD = D(3)
+    println(matD)
+  }
+
+  test("R Matrix") {
+    val matR = R(5, 3)
+    println(matR)
   }
 }

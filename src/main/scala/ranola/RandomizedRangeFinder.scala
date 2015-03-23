@@ -170,7 +170,7 @@ object RandomizedRangeFinder {
    */
   def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     val (m, n) = (M.rows, M.cols)
-    val D = D(n) // Diagonal matrix with complex var uniformly distributed on complex unit circle
+    val D = ??? // Diagonal matrix with complex var uniformly distributed on complex unit circle
     val F = ??? // DFT matrix
     val R = ??? // Matrix with random columns of the I
     val SRFT = ??? // sqrt(n / sketchSize) * D * F * R
@@ -192,6 +192,33 @@ object RandomizedRangeFinder {
     } x(i, j) = ???
 
     fourierTr(x)
+  }
+
+  def R(n: Int, sketchSize: Int): DenseMatrix[Double] = {
+    require(sketchSize <= n)
+
+    val data = Array.tabulate(n)(a => a)
+    val samples = shuffle(data, sketchSize).toSeq
+    val I = DenseMatrix.eye[Double](n)
+
+    I(::, samples).toDenseMatrix
+  }
+
+  // Fisher-Yates shuffle
+  // See: [[http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle]]
+  def shuffle[@specialized(Double) T](array: Array[T],
+                                      sketchSize: Int,
+                                      swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
+    val random = new scala.util.Random
+
+    for (n <- sketchSize - 1 to 0 by -1) {
+      val k = random.nextInt(n + 1)
+      val (a, b) = swap(array(k), array(n))
+      array(k) = a
+      array(n) = b
+    }
+
+    array.slice(0, sketchSize)
   }
 
 
