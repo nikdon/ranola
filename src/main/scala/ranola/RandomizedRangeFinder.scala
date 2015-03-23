@@ -2,7 +2,10 @@ package ranola
 
 
 import breeze.linalg._
-import breeze.numerics.sqrt
+import breeze.math.Complex
+import breeze.numerics.constants.Pi
+import breeze.numerics.{exp, sqrt}
+import breeze.signal.fourierTr
 import breeze.stats.distributions.Rand
 
 
@@ -167,13 +170,28 @@ object RandomizedRangeFinder {
    */
   def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     val (m, n) = (M.rows, M.cols)
-    val D = ???     // Diagonal matrix with complex var uniformly distributed on complex unit circle
-    val F = ???     // DFT matrix
-    val R = ???     // Matrix with random columns of the I
-    val SRFT = ???  // sqrt(n / sketchSize) * D * F * R
-    val Y = ???     // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
-    val q = ???     // qr.reduced.justQ(Y)
-    ???             // q
+    val D = D(n) // Diagonal matrix with complex var uniformly distributed on complex unit circle
+    val F = ??? // DFT matrix
+    val R = ??? // Matrix with random columns of the I
+    val SRFT = ??? // sqrt(n / sketchSize) * D * F * R
+    val Y = ??? // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
+    val q = ??? // qr.reduced.justQ(Y)
+    ??? // q
+  }
+
+  def D(n: Int): DenseMatrix[Complex] = {
+    diag(DenseVector(Array.tabulate(n)(a => exp(Complex.i * 2 * Pi * util.Random.nextGaussian()))))
+  }
+
+  def F(n: Int): DenseMatrix[Complex] = {
+    val x = DenseMatrix.zeros[Double](n, n)
+
+    for {
+      i <- 0 until n
+      j <- 0 until n
+    } x(i, j) = ???
+
+    fourierTr(x)
   }
 
 
