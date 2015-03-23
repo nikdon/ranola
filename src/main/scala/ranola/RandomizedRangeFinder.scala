@@ -211,7 +211,7 @@ object RandomizedRangeFinder {
                                       swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
     val random = new scala.util.Random
 
-    for (n <- sketchSize - 1 to 0 by -1) {
+    for (n <- array.length - 1 to 0 by -1) {
       val k = random.nextInt(n + 1)
       val (a, b) = swap(array(k), array(n))
       array(k) = a
