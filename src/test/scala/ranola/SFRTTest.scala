@@ -1,6 +1,7 @@
 package ranola
 
 
+import breeze.linalg.DenseMatrix
 import breeze.util.DoubleImplicits
 import org.junit.runner.RunWith
 import org.scalatest._
@@ -14,7 +15,7 @@ import ranola.RandomizedRangeFinder._
 class SFRTTest extends FunSuite with Matchers with DoubleImplicits {
 
   test("F Matrix") {
-    val matF = F(3)
+    val matF = F(4)
     println(matF)
   }
 

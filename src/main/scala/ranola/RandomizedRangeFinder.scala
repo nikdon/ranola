@@ -184,22 +184,16 @@ object RandomizedRangeFinder {
   }
 
   def F(n: Int): DenseMatrix[Complex] = {
-    val x = DenseMatrix.zeros[Double](n, n)
-
-    for {
-      i <- 0 until n
-      j <- 0 until n
-    } x(i, j) = ???
-
-    fourierTr(x)
+    val I = DenseMatrix.eye[Complex](n)
+    I(*, ::).map(dv => fourierTr(dv))
   }
 
-  def R(n: Int, sketchSize: Int): DenseMatrix[Double] = {
+  def R(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
     require(sketchSize <= n)
 
+    val I = DenseMatrix.eye[Complex](n)
     val data = Array.tabulate(n)(a => a)
     val samples = shuffle(data, sketchSize).toSeq
-    val I = DenseMatrix.eye[Double](n)
 
     I(::, samples).toDenseMatrix
   }
