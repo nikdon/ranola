@@ -170,13 +170,13 @@ object RandomizedRangeFinder {
    */
   def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     val (m, n) = (M.rows, M.cols)
-    val D = ??? // Diagonal matrix with complex var uniformly distributed on complex unit circle
-    val F = ??? // DFT matrix
-    val R = ??? // Matrix with random columns of the I
-    val SRFT = ??? // sqrt(n / sketchSize) * D * F * R
-    val Y = ??? // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
-    val q = ??? // qr.reduced.justQ(Y)
-    ??? // q
+    val d = D(n)                                              // Diagonal matrix with complex var uniformly distributed on complex unit circle
+    val f = F(n)                                              // DFT matrix
+    val r = R (n , sketchSize)                                // Matrix with random columns of the I
+    val srft = d * f * r * Complex(sqrt(n / sketchSize), 0)   // sqrt(n / sketchSize) * D * F * R
+    val Y = M * srft.mapValues(_.real)                        // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
+    val q = qr.reduced.justQ(Y)
+    q
   }
 
   def D(n: Int): DenseMatrix[Complex] = {
