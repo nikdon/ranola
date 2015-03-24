@@ -7,6 +7,7 @@ import breeze.linalg.{argsort, DenseVector, DenseMatrix}
 import breeze.util.DoubleImplicits
 import org.junit.runner.RunWith
 
+
 import ranola.TestHelpers._
 
 
@@ -18,7 +19,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     val eigVals = DenseVector(9.0,25.0,82.0)
     val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
-    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.generic(A, sketchSize = 2), k = 2)
+    val EigSym(lambda, evs) = evdr(A, RandomizedRangeFinder.generic(A, sketchSize = 3), k = 3)
 
     val idx = argsort(lambda)
 

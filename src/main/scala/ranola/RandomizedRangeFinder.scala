@@ -2,10 +2,7 @@ package ranola
 
 
 import breeze.linalg._
-import breeze.math.Complex
-import breeze.numerics.constants.Pi
-import breeze.numerics.{exp, sqrt}
-import breeze.signal.fourierTr
+import breeze.numerics.sqrt
 import breeze.stats.distributions.Rand
 
 
@@ -70,7 +67,7 @@ object RandomizedRangeFinder {
    * @param nRandVec Number of random vectors
    * @param tolerance Tolerance
    * @param maxIter Max number of iterations
-   * @return
+   * @return A size-by-size projection matrix Q
    */
   def adaptive(M: DenseMatrix[Double], nRandVec: Int, tolerance: Double, maxIter: Int): DenseMatrix[Double] = {
     require(nRandVec > 1, "Number of random vectors should be greater than 1")
@@ -170,49 +167,10 @@ object RandomizedRangeFinder {
    */
   def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     val (m, n) = (M.rows, M.cols)
-    val d = D(n)                                              // Diagonal matrix with complex var uniformly distributed on complex unit circle
-    val f = F(n)                                              // DFT matrix
-    val r = R (n , sketchSize)                                // Matrix with random columns of the I
-    val srft = d * f * r * Complex(sqrt(n / sketchSize), 0)   // sqrt(n / sketchSize) * D * F * R
-    val Y = M * srft.mapValues(_.real)                        // M * SRFT   // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
+    val srft = SRFT(n, sketchSize)
+    val Y = M * srft.mapValues(_.real) // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]] or [[doi:10.1016/j.acha.2007.12.002]]
     val q = qr.reduced.justQ(Y)
     q
-  }
-
-  def D(n: Int): DenseMatrix[Complex] = {
-    diag(DenseVector(Array.tabulate(n)(a => exp(Complex.i * 2 * Pi * util.Random.nextGaussian()))))
-  }
-
-  def F(n: Int): DenseMatrix[Complex] = {
-    val I = DenseMatrix.eye[Complex](n)
-    I(*, ::).map(dv => fourierTr(dv))
-  }
-
-  def R(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
-    require(sketchSize <= n)
-
-    val I = DenseMatrix.eye[Complex](n)
-    val data = Array.tabulate(n)(a => a)
-    val samples = shuffle(data, sketchSize).toSeq
-
-    I(::, samples).toDenseMatrix
-  }
-
-  // Fisher-Yates shuffle
-  // See: [[http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle]]
-  def shuffle[@specialized(Double) T](array: Array[T],
-                                      sketchSize: Int,
-                                      swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
-    val random = new scala.util.Random
-
-    for (n <- array.length - 1 to 0 by -1) {
-      val k = random.nextInt(n + 1)
-      val (a, b) = swap(array(k), array(n))
-      array(k) = a
-      array(n) = b
-    }
-
-    array.slice(0, sketchSize)
   }
 
 

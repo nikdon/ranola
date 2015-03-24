@@ -1,16 +1,13 @@
 package ranola
 
 
-import breeze.linalg.{qr, DenseMatrix}
-import breeze.math.Complex
-import breeze.numerics._
 import breeze.util.DoubleImplicits
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit._
 
 
-import ranola.RandomizedRangeFinder._
+import ranola.SRFT._
 
 
 @RunWith(classOf[JUnitRunner])
@@ -35,10 +32,7 @@ class SFRTTest extends FunSuite with Matchers with DoubleImplicits {
     val n = 3
     val s = 3
 
-    val d = D(n)
-    val f = F(n)
-    val r = R (n , s)
-    val srft = d * f * r * Complex(sqrt(n / s), 0)
+    val srft = SRFT(n, s)
 
     println(srft)
   }
