@@ -95,9 +95,9 @@ Number of oversamples depends on:
 
 - **Matrix dimensions**. Very large matrices may require more oversampling.
 
-- **Singular spectrum**. The more rapid the decay of the singular values, the less oversampling is needed. In the extreme case that the matrix has exact rank k, it is not necessary to oversample.
+- **Singular spectrum**. The more rapid the decay of the singular values, the less oversampling is needed. In the extreme case that the matrix has exact rank **k**, it is not necessary to oversample.
 
-- **Random test matrix**. Gaussian matrices succeed with very little oversampling, such as p = 5 or p = 10. There is rarely any advantage to select p > k.
+- **Random test matrix**. Gaussian matrices succeed with very little oversampling, such as ```overSamples = 5``` or ```overSamples = 10```. There is rarely any advantage to select **overSamples** > **k**.
 
 ## Notes
 
