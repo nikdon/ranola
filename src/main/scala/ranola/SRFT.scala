@@ -14,11 +14,14 @@ import breeze.signal.fourierTr
 object SRFT {
 
   def apply(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
+    srft(n: Int, sketchSize: Int)
+  }
+
+  def srft(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
     val d = SRFT.D(n)
     val f = SRFT.F(n)
     val r = SRFT.R(n, sketchSize)
-    val srft = (d * (f * r)) * Complex(sqrt(n / sketchSize), 0)
-    srft
+    (d * (f * r)) * Complex(sqrt(n / sketchSize), 0)
   }
 
   /**
@@ -49,8 +52,6 @@ object SRFT {
    * @return A n-by-sketchSize matrix
    */
   def R(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
-    require(sketchSize <= n)
-
     val I = DenseMatrix.eye[Complex](n)
     val data = Array.tabulate(n)(a => a)
     val samples = shuffle(data, sketchSize).toSeq

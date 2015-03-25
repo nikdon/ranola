@@ -12,11 +12,43 @@ import breeze.linalg.{DenseMatrix, eig, min}
  */
 object evdr {
 
-  def apply(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
-    doEvdr(M, Q, k)
+
+  object generic {
+    def apply(M: DenseMatrix[Double], k: Int, overSamples: Int): DenseEigSym = {
+      doEvdr(M, k, RandomizedRangeFinder.generic(M, sketchSize = k + overSamples))
+    }
   }
 
-  private def doEvdr(M: DenseMatrix[Double], Q: DenseMatrix[Double], k: Int): DenseEigSym = {
+
+  object fastGeneric {
+    def apply(M: DenseMatrix[Double], k: Int, overSamples: Int): DenseEigSym = {
+      doEvdr(M, k, RandomizedRangeFinder.fastGeneric(M, sketchSize = k + overSamples))
+    }
+  }
+
+
+  object powerIteration {
+    def apply(M: DenseMatrix[Double], k: Int, nIter: Int, overSamples: Int): DenseEigSym = {
+      doEvdr(M, k, RandomizedRangeFinder.powerIteration(M, sketchSize = k + overSamples, nIter))
+    }
+  }
+
+
+  object adaptive {
+    def apply(M: DenseMatrix[Double], k: Int, tol: Double, maxIter: Int, overSamples: Int): DenseEigSym = {
+      doEvdr(M, k, RandomizedRangeFinder.adaptive(M, nRandVec = k + overSamples, tol, maxIter))
+    }
+  }
+
+
+  object subspaceIteration {
+    def apply(M: DenseMatrix[Double], k: Int, nIter: Int, overSamples: Int): DenseEigSym = {
+      doEvdr(M, k, RandomizedRangeFinder.subspaceIteration(M, sketchSize = k + overSamples, nIter))
+    }
+  }
+
+
+  private def doEvdr(M: DenseMatrix[Double], k: Int, Q: DenseMatrix[Double]): DenseEigSym = {
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
     val b = Q.t * (M * Q)

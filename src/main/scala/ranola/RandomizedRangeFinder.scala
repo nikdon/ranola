@@ -136,20 +136,22 @@ object RandomizedRangeFinder {
    * @return A size-by-size projection matrix Q
    */
   def subspaceIteration(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
+    val qi = DenseMatrix.zeros[Double](M.rows, min(M.cols, M.rows))
+
     val R = drawRandomMatrix(M, sketchSize)
     val Y = M * R
     val q = qr.reduced.justQ(Y)
 
     var i = 0
     while (i < nIter) {
-      Y := M.t * q
-      q := qr.reduced.justQ(Y)
-      Y := M * q
-      q := qr.reduced.justQ(Y)
+      val Yih = M.t * q
+      val qih = qr.reduced.justQ(Yih)
+      val Yi = M * qih
+      qi := qr.reduced.justQ(Y)
       i += 1
     }
 
-    q
+    qi
   }
 
   def subspaceIteration(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
@@ -166,9 +168,13 @@ object RandomizedRangeFinder {
    * @return A size-by-size projection matrix Q
    */
   def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    val (m, n) = (M.rows, M.cols)
+    val (_, n) = (M.rows, M.cols)
+
+    require(sketchSize <= n, "Sketch size should be less then number of columns in matrix to decompose")
+
     val srft = SRFT(n, sketchSize)
-    val Y = M * srft.mapValues(_.real) // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]] or [[doi:10.1016/j.acha.2007.12.002]]
+    // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]] or [[doi:10.1016/j.acha.2007.12.002]]
+    val Y = M * srft.mapValues(_.real)
     val q = qr.reduced.justQ(Y)
     q
   }

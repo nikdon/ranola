@@ -1,21 +1,20 @@
 package ranola
 
 
+import breeze.linalg._
 import breeze.linalg.svd.SVD
 import breeze.numerics.abs
-import org.scalatest._
-import org.scalatest.junit._
-import breeze.linalg._
 import breeze.util.DoubleImplicits
 import org.junit.runner.RunWith
-
+import org.scalatest._
+import org.scalatest.junit._
 import ranola.TestHelpers._
 
 
 @RunWith(classOf[JUnitRunner])
 class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
-  test("svd and svdr singular values are equal") {
+  test("svd and svdr.generic singular values are equal") {
     val a = DenseMatrix(
       (2.0, 4.0, 0.0),
       (1.0, 3.0, 4.0),
@@ -27,32 +26,17 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     for (m <- List(a, a.t)) {
       val SVD(u, s, v) = svd.reduced(m)
-      val SVD(ur, sr, vr) = svdr(m, RandomizedRangeFinder.generic(m, sketchSize = 3), m.rows min m.cols)
+      val SVD(ur, sr, vr) = svdr.generic(m, k = m.rows min m.cols, overSamples = 1)
 
       vectorsNearlyEqual(s, sr)
       matricesNearlyEqual(abs(u), abs(ur))
       matricesNearlyEqual(abs(v), abs(vr))
+      matricesNearlyEqual(m, ur * diag(sr) * vr)
     }
   }
 
-  test("svdr A[m, n], m < n") {
-    val m = DenseMatrix(
-      (2.0, 4.0, 0.0),
-      (1.0, 3.0, 4.0),
-      (5.0, 0.0, 0.9),
-      (3.0, 5.0, 0.5),
-      (7.5, 1.0, 6.0),
-      (0.0, 7.0, 0.0)
-    ).t
-
-    val SVD(u, sr, vt) = svdr(m, RandomizedRangeFinder.generic(m, sketchSize = 3), m.rows min m.cols)
-
-    val reM = u * diag(sr) * vt
-    matricesNearlyEqual(reM, m)
-  }
-
-  test("svdr A[m, n], m > n") {
-    val m = DenseMatrix(
+  test("svd and svdr.fastGeneric singular values are equal") {
+    val a = DenseMatrix(
       (2.0, 4.0, 0.0),
       (1.0, 3.0, 4.0),
       (5.0, 0.0, 0.9),
@@ -61,11 +45,110 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
       (0.0, 7.0, 0.0)
     )
 
-    val SVD(u, sr, vt) = svdr(m, RandomizedRangeFinder.generic(m, sketchSize = 3), m.rows min m.cols)
+    for (m <- List(a, a.t)) {
+      val SVD(u, s, v) = svd.reduced(m)
+      val SVD(ur, sr, vr) = svdr.fastGeneric(m, k = m.rows min m.cols, overSamples = 0)
 
-    val reM = u * diag(sr) * vt
-    matricesNearlyEqual(reM, m)
+      vectorsNearlyEqual(s, sr)
+      matricesNearlyEqual(abs(u), abs(ur))
+      matricesNearlyEqual(abs(v), abs(vr))
+      matricesNearlyEqual(m, ur * diag(sr) * vr)
+    }
   }
 
+  test("svd and svdr.powerIteration singular values are equal") {
+    val a = DenseMatrix(
+      (2.0, 4.0, 0.0),
+      (1.0, 3.0, 4.0),
+      (5.0, 0.0, 0.9),
+      (3.0, 5.0, 0.5),
+      (7.5, 1.0, 6.0),
+      (0.0, 7.0, 0.0)
+    )
 
+    for (m <- List(a, a.t)) {
+      val SVD(u, s, v) = svd.reduced(m)
+      val SVD(ur, sr, vr) = svdr.powerIteration(m, k = m.rows min m.cols, nIter = 5, overSamples = 1)
+
+
+      vectorsNearlyEqual(s, sr)
+      matricesNearlyEqual(abs(u), abs(ur))
+      matricesNearlyEqual(abs(v), abs(vr))
+      matricesNearlyEqual(m, ur * diag(sr) * vr)
+    }
+  }
+
+  test("svd and svdr.adaptive singular values are equal A[m x n], m > n") {
+    // Note: Size of Q depends on maxIter and overSamples,
+    // so these should be true:
+    // (maxIter + overSamples) <= A.cols   ==> for convergence
+    // (maxIter + overSamples) > k         ==> for randomized decomposition
+
+    val a = DenseMatrix(
+      (2.0, 4.0, 0.0),
+      (1.0, 3.0, 4.0),
+      (5.0, 0.0, 0.9),
+      (3.0, 5.0, 0.5),
+      (7.5, 1.0, 6.0),
+      (0.0, 7.0, 0.0)
+    )
+
+    val SVD(u, s, v) = svd.reduced(a)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, tol = 1E-3, maxIter = 5, overSamples = 0)
+
+
+    vectorsNearlyEqual(s, sr)
+    matricesNearlyEqual(abs(u), abs(ur))
+    matricesNearlyEqual(abs(v), abs(vr))
+    matricesNearlyEqual(a, ur * diag(sr) * vr)
+
+  }
+
+  test("svd and svdr.adaptive singular values are equal for A[m x n], m < n") {
+    // Note: Size of Q depends on maxIter and overSamples,
+    // so these should be true:
+    // (maxIter + overSamples) <= A.cols   ==> for convergence
+    // (maxIter + overSamples) > k         ==> for randomized decomposition
+
+    val a = DenseMatrix(
+      (2.0, 4.0, 0.0),
+      (1.0, 3.0, 4.0),
+      (5.0, 0.0, 0.9),
+      (3.0, 5.0, 0.5),
+      (7.5, 1.0, 6.0),
+      (0.0, 7.0, 0.0)
+    ).t
+
+    val SVD(u, s, v) = svd.reduced(a)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, tol = 1E-3, maxIter = 3, overSamples = 0)
+
+
+    vectorsNearlyEqual(s, sr)
+    matricesNearlyEqual(abs(u), abs(ur))
+    matricesNearlyEqual(abs(v), abs(vr))
+    matricesNearlyEqual(a, ur * diag(sr) * vr)
+
+  }
+
+  test("svd and svdr.subspaceIteration singular values are equal") {
+    val a = DenseMatrix(
+      (2.0, 4.0, 0.0),
+      (1.0, 3.0, 4.0),
+      (5.0, 0.0, 0.9),
+      (3.0, 5.0, 0.5),
+      (7.5, 1.0, 6.0),
+      (0.0, 7.0, 0.0)
+    )
+
+    for (m <- List(a, a.t)) {
+      val SVD(u, s, v) = svd.reduced(m)
+      val SVD(ur, sr, vr) = svdr.subspaceIteration(m, k = m.rows min m.cols, nIter = 5, overSamples = 5)
+
+
+      vectorsNearlyEqual(s, sr)
+      matricesNearlyEqual(abs(u), abs(ur))
+      matricesNearlyEqual(abs(v), abs(vr))
+      matricesNearlyEqual(m, ur * diag(sr) * vr)
+    }
+  }
 }
