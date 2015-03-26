@@ -7,7 +7,7 @@ import breeze.linalg.svd.{DenseSVD, SVD}
 import breeze.numerics._
 
 
-trait Decomposition[Result] {
+trait Decomposition[ResultType] {
 
   /**
    * Abstract decomposition method
@@ -17,7 +17,7 @@ trait Decomposition[Result] {
    * @param Q Orthonormal matrix of M
    * @return Result of decomposition
    */
-  def decompose(M: DenseMatrix[Double], k: Int, Q: DenseMatrix[Double]): Result
+  def decompose(M: DenseMatrix[Double], k: Int, Q: DenseMatrix[Double]): ResultType
 
   def generic(M: DenseMatrix[Double], k: Int, overSamples: Int) = {
     decompose(M, k, GenericRangeFinder(M, sketchSize = k + overSamples))
@@ -56,7 +56,6 @@ object evdr extends Decomposition[DenseEigSym] {
 
   /**
    * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive.
-   * Applicable for EVD.
    *
    * @param u eigenvectors
    * @return eigenvectors with resolved sign ambiguity
@@ -89,7 +88,6 @@ object svdr extends Decomposition[DenseSVD] {
 
   /**
    * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive.
-   * Applicable for SVD.
    *
    * @param u left singular vectors
    * @param v right singular vectors
