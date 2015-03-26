@@ -191,7 +191,7 @@ object SubspaceIterationRangeFinder extends RandomizedRangeFinder {
       val Yih = M.t * q
       val qih = qr.reduced.justQ(Yih)
       val Yi = M * qih
-      qi := qr.reduced.justQ(Y)
+      qi := qr.reduced.justQ(Yi)
       i += 1
     }
 
@@ -216,8 +216,11 @@ object FastGenericRangeFinder extends RandomizedRangeFinder {
     require(sketchSize <= n, "Sketch size should be less then number of columns in matrix to decompose")
 
     val srft = SRFT(n, sketchSize)
-    // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]] or [[doi:10.1016/j.acha.2007.12.002]]
+
+    // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
+    // or [[doi:10.1016/j.acha.2007.12.002]]
     val Y = M * srft.mapValues(_.real)
+
     val q = qr.reduced.justQ(Y)
     q
   }
