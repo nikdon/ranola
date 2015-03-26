@@ -6,17 +6,56 @@ import breeze.numerics.sqrt
 import breeze.stats.distributions.Rand
 
 
-/**
- * Implementation of algorithms for computing an orthonormal matrix whose range approximates the range of M
- */
-object RandomizedRangeFinder {
+trait RandomizedRangeFinder {
+  /**
+   * Draw random matrix
+   *
+   * @param M Matrix
+   * @param sketchSize proposed sketch size that is second dimension of random matrix
+   * @return Random matrix
+   */
+  protected def drawRandomMatrix(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+    val n = checkAndGetSketchSize(M, sketchSize)
+    val l = M.cols
+    DenseMatrix.rand(l, n, rand = Rand.gaussian)
+  }
 
-  /////////////////////////////////////////////////////////
-  // Implementation of algorithms
-  /////////////////////////////////////////////////////////
+  /**
+   * Checks the proposed size of the sketch.
+   * @param M Matrix to be sampled
+   * @param s proposed sketch size
+   * @return Correct sketch size
+   */
+  protected def checkAndGetSketchSize(M: DenseMatrix[Double], s: Int): Int = {
+    if (s > M.rows) M.rows
+    else s
+  }
 
-  private val DEFAULT_N_ITER = 10
+  /**
+   * Maximum of DenseVector norms in the array
+   *
+   * @param y Array contained DenseVectors
+   * @return Maximum norm of the given array
+   */
+  protected def maxNorm(y: Array[DenseVector[Double]]): Double = {
+    val len = y.length
+    val norms = new Array[Double](len)
+    var i = 0
+    while (i < len) {
+      norms(i) = norm(y(i))
+      i += 1
+    }
+    max(norms)
+  }
+}
 
+
+/////////////////////////////////////////////////////////
+// Implementation of algorithms
+/////////////////////////////////////////////////////////
+
+
+object PowerIterationRangeFinder extends RandomizedRangeFinder {
   /**
    * Algorithm 4.3 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -27,7 +66,7 @@ object RandomizedRangeFinder {
    * @param nIter Number of power iterations used to stabilize the result
    * @return A size-by-size projection matrix Q
    */
-  def powerIteration(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
+  def apply(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
     val R = drawRandomMatrix(M, sketchSize)
     val Y = M * R
 
@@ -40,11 +79,10 @@ object RandomizedRangeFinder {
     val q = qr.reduced.justQ(Y)
     q
   }
+}
 
-  def powerIteration(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    powerIteration(M, sketchSize, nIter = DEFAULT_N_ITER)
-  }
 
+object GenericRangeFinder extends RandomizedRangeFinder {
   /**
    * Algorithm 4.1 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -54,10 +92,13 @@ object RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def generic(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    powerIteration(M, sketchSize, 0)
+  def apply(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+    PowerIterationRangeFinder(M, sketchSize, 0)
   }
+}
 
+
+object AdaptiveRangeFinder extends RandomizedRangeFinder {
   /**
    * Algorithm 4.2 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -69,7 +110,7 @@ object RandomizedRangeFinder {
    * @param maxIter Max number of iterations
    * @return A size-by-size projection matrix Q
    */
-  def adaptive(M: DenseMatrix[Double], nRandVec: Int, tolerance: Double, maxIter: Int): DenseMatrix[Double] = {
+  def apply(M: DenseMatrix[Double], nRandVec: Int, tolerance: Double, maxIter: Int): DenseMatrix[Double] = {
     require(nRandVec > 1, "Number of random vectors should be greater than 1")
 
     val (m, n) = (M.rows, M.cols)
@@ -125,7 +166,10 @@ object RandomizedRangeFinder {
 
     Q
   }
+}
 
+
+object SubspaceIterationRangeFinder extends RandomizedRangeFinder {
   /**
    * Algorithm 4.4 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -135,7 +179,7 @@ object RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def subspaceIteration(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
+  def apply(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
     val qi = DenseMatrix.zeros[Double](M.rows, min(M.cols, M.rows))
 
     val R = drawRandomMatrix(M, sketchSize)
@@ -153,11 +197,10 @@ object RandomizedRangeFinder {
 
     qi
   }
+}
 
-  def subspaceIteration(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    subspaceIteration(M, sketchSize, nIter = DEFAULT_N_ITER)
-  }
 
+object FastGenericRangeFinder extends RandomizedRangeFinder {
   /**
    * Algorithm 4.5 of "Finding structure with randomness:
    * Stochastic algorithms for constructing approximate matrix decompositions"
@@ -167,7 +210,7 @@ object RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def fastGeneric(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+  def apply(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
     val (_, n) = (M.rows, M.cols)
 
     require(sketchSize <= n, "Sketch size should be less then number of columns in matrix to decompose")
@@ -178,51 +221,4 @@ object RandomizedRangeFinder {
     val q = qr.reduced.justQ(Y)
     q
   }
-
-
-  ///////////////////////////////////////
-  // Helpers
-  ///////////////////////////////////////
-
-  /**
-   * Draw random matrix
-   *
-   * @param M Matrix
-   * @param sketchSize proposed sketch size that is second dimension of random matrix
-   * @return Random matrix
-   */
-  private def drawRandomMatrix(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    val n = checkAndGetSketchSize(M, sketchSize)
-    val l = M.cols
-    DenseMatrix.rand(l, n, rand = Rand.gaussian)
-  }
-
-  /**
-   * Checks the proposed size of the sketch.
-   * @param M Matrix to be sampled
-   * @param s proposed sketch size
-   * @return Correct sketch size
-   */
-  private def checkAndGetSketchSize(M: DenseMatrix[Double], s: Int): Int = {
-    if (s > M.rows) M.rows
-    else s
-  }
-
-  /**
-   * Maximum of DenseVector norms in the array
-   *
-   * @param y Array contained DenseVectors
-   * @return Maximum norm of the given array
-   */
-  private def maxNorm(y: Array[DenseVector[Double]]): Double = {
-    val len = y.length
-    val norms = new Array[Double](len)
-    var i = 0
-    while (i < len) {
-      norms(i) = norm(y(i))
-      i += 1
-    }
-    max(norms)
-  }
-
 }
