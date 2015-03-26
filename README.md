@@ -1,4 +1,4 @@
-# ranola
+# ranola [![Build Status](https://travis-ci.org/nikdon/ranola.svg?branch=master)](https://travis-ci.org/nikdon/ranola)
 
 **ranola** is a library for low-rank matrix approximations by randomized algorithms. Compared with standard deterministic algorithms, the randomized methods are often faster and produce accurate results.
 
