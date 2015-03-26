@@ -14,13 +14,13 @@ import breeze.signal.fourierTr
 object SRFT {
 
   def apply(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
-    srft(n: Int, sketchSize: Int)
+    getSRFTMatrix(n: Int, sketchSize: Int)
   }
 
-  def srft(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
-    val d = SRFT.D(n)
-    val f = SRFT.F(n)
-    val r = SRFT.R(n, sketchSize)
+  def getSRFTMatrix(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
+    val d = D(n)
+    val f = F(n)
+    val r = R(n, sketchSize)
     (d * (f * r)) * Complex(sqrt(n / sketchSize), 0)
   }
 
@@ -30,7 +30,7 @@ object SRFT {
    * @param n Size
    * @return A n-by-n diagonal matrix
    */
-  def D(n: Int): DenseMatrix[Complex] = {
+  private[this] def D(n: Int): DenseMatrix[Complex] = {
     diag(DenseVector(Array.tabulate(n)(a => exp(Complex.i * 2 * Pi * util.Random.nextGaussian()))))
   }
 
@@ -40,7 +40,7 @@ object SRFT {
    * @param n Size
    * @return A n-by-n matrix
    */
-  def F(n: Int): DenseMatrix[Complex] = {
+  private[this] def F(n: Int): DenseMatrix[Complex] = {
     val I = DenseMatrix.eye[Complex](n)
     I(*, ::).map(dv => fourierTr(dv))
   }
@@ -51,7 +51,7 @@ object SRFT {
    * @param sketchSize Sketch size
    * @return A n-by-sketchSize matrix
    */
-  def R(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
+  private[this] def R(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
     val I = DenseMatrix.eye[Complex](n)
     val data = Array.tabulate(n)(a => a)
     val samples = shuffle(data, sketchSize).toSeq
@@ -68,7 +68,7 @@ object SRFT {
    * @tparam T Any
    * @return Shuffled array sliced from 0 up to sketchSize
    */
-  private def shuffle[T](array: Array[T],
+  private[this] def shuffle[T](array: Array[T],
                          sketchSize: Int,
                          swap: (T, T) => (T, T) = { (a: T, b: T) => (b, a) }): Array[T] = {
     val random = new scala.util.Random
