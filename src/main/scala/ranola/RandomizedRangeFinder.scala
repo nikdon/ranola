@@ -2,11 +2,18 @@ package ranola
 
 
 import breeze.linalg._
+import breeze.linalg.operators.OpMulMatrix
+import breeze.linalg.support.CanTranspose
 import breeze.numerics.sqrt
 import breeze.stats.distributions.Rand
 
 
 trait RandomizedRangeFinder {
+
+  type AnyMatrix = Matrix[_]
+  type OpMulMatrixDenseMatrix[Mat] = OpMulMatrix.Impl2[Mat, DenseMatrix[Double], DenseMatrix[Double]]
+  type OpMulMatrixDenseVector[Mat] = OpMulMatrix.Impl2[Mat, DenseVector[Double], DenseVector[Double]]
+
   /**
    * Draw random matrix
    *
@@ -14,7 +21,7 @@ trait RandomizedRangeFinder {
    * @param sketchSize proposed sketch size that is second dimension of random matrix
    * @return Random matrix
    */
-  protected def drawRandomMatrix(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+  protected def drawRandomMatrix[Mat <: AnyMatrix](M: Mat, sketchSize: Int): DenseMatrix[Double] = {
     val n = checkAndGetSketchSize(M, sketchSize)
     val l = M.cols
     DenseMatrix.rand(l, n, rand = Rand.gaussian)
@@ -26,7 +33,7 @@ trait RandomizedRangeFinder {
    * @param s proposed sketch size
    * @return Correct sketch size
    */
-  protected def checkAndGetSketchSize(M: DenseMatrix[Double], s: Int): Int = {
+  protected def checkAndGetSketchSize[Mat <: AnyMatrix](M: Mat, s: Int): Int = {
     if (s > M.rows) M.rows
     else s
   }
@@ -66,13 +73,18 @@ object PowerIterationRangeFinder extends RandomizedRangeFinder {
    * @param nIter Number of power iterations used to stabilize the result
    * @return A size-by-size projection matrix Q
    */
-  def apply(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
+  def apply[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, sketchSize: Int, nIter: Int)
+                                                    (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
+                                                     trans: CanTranspose[Mat, MatTrans],
+                                                     mltTrans: OpMulMatrixDenseMatrix[MatTrans])
+    : DenseMatrix[Double] = {
+
     val R = drawRandomMatrix(M, sketchSize)
-    val Y = M * R
+    val Y = mltMatDenMat(M, R) // M * R
 
     var i = 0
     while (i < nIter) {
-      Y := M * (M.t * Y)
+      Y := mltMatDenMat(M, mltTrans(trans.apply(M), Y)) // M * (M.t * Y)
       i += 1
     }
 
@@ -92,8 +104,13 @@ object GenericRangeFinder extends RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def apply(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
-    PowerIterationRangeFinder(M, sketchSize, 0)
+  def apply[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, sketchSize: Int)
+                                                    (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
+                                                     trans: CanTranspose[Mat, MatTrans],
+                                                     mltTrans: OpMulMatrixDenseMatrix[MatTrans])
+    : DenseMatrix[Double] = {
+
+    PowerIterationRangeFinder(M, sketchSize, 0)(mltMatDenMat, trans, mltTrans)
   }
 }
 
@@ -110,7 +127,10 @@ object AdaptiveRangeFinder extends RandomizedRangeFinder {
    * @param maxIter Max number of iterations
    * @return A size-by-size projection matrix Q
    */
-  def apply(M: DenseMatrix[Double], nRandVec: Int, tolerance: Double, maxIter: Int): DenseMatrix[Double] = {
+  def apply[Mat <: AnyMatrix](M: Mat, nRandVec: Int, tolerance: Double, maxIter: Int)
+                             (implicit mltMatDenVec: OpMulMatrixDenseVector[Mat])
+    : DenseMatrix[Double] = {
+
     require(nRandVec > 1, "Number of random vectors should be greater than 1")
 
     val (m, n) = (M.rows, M.cols)
@@ -131,7 +151,7 @@ object AdaptiveRangeFinder extends RandomizedRangeFinder {
     i = 0
     while (i < nRandVec) {
       W(i) = DenseVector.rand(n, rand = Rand.gaussian)
-      Y(i) = M * W(i)
+      Y(i) = mltMatDenVec(M, W(i)) // M * W(i)
       i += 1
     }
 
@@ -148,7 +168,7 @@ object AdaptiveRangeFinder extends RandomizedRangeFinder {
       else Q = DenseMatrix.horzcat(Q, q.asDenseMatrix.t)
 
       w := DenseVector.rand(n, rand = Rand.gaussian)
-      tmp := M * w
+      tmp := mltMatDenVec(M, w) // M * w
       y := tmp - Q * (Q.t * tmp)
 
       W :+= w
@@ -179,18 +199,23 @@ object SubspaceIterationRangeFinder extends RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def apply(M: DenseMatrix[Double], sketchSize: Int, nIter: Int): DenseMatrix[Double] = {
+  def apply[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, sketchSize: Int, nIter: Int)
+                                                    (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
+                                                     trans: CanTranspose[Mat, MatTrans],
+                                                     mltTrans: OpMulMatrixDenseMatrix[MatTrans])
+    : DenseMatrix[Double] = {
+
     val qi = DenseMatrix.zeros[Double](M.rows, min(M.cols, M.rows))
 
     val R = drawRandomMatrix(M, sketchSize)
-    val Y = M * R
+    val Y = mltMatDenMat(M, R) // M * R
     val q = qr.reduced.justQ(Y)
 
     var i = 0
     while (i < nIter) {
-      val Yih = M.t * q
+      val Yih = mltTrans(trans.apply(M), q) // M.t * q
       val qih = qr.reduced.justQ(Yih)
-      val Yi = M * qih
+      val Yi = mltMatDenMat(M, qih) // M * qih
       qi := qr.reduced.justQ(Yi)
       i += 1
     }
@@ -210,7 +235,9 @@ object FastGenericRangeFinder extends RandomizedRangeFinder {
    * @param sketchSize Size of the matrix to return
    * @return A size-by-size projection matrix Q
    */
-  def apply(M: DenseMatrix[Double], sketchSize: Int): DenseMatrix[Double] = {
+  def apply[Mat <: AnyMatrix](M: Mat, sketchSize: Int)(implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat])
+    : DenseMatrix[Double] = {
+
     val (_, n) = (M.rows, M.cols)
 
     require(sketchSize <= n, "Sketch size should be less then number of columns in matrix to decompose")
@@ -219,7 +246,7 @@ object FastGenericRangeFinder extends RandomizedRangeFinder {
 
     // See $3.3 in [[http://www.cs.yale.edu/homes/el327/papers/approximationOfMatrices.pdf]]
     // or [[doi:10.1016/j.acha.2007.12.002]]
-    val Y = M * srft.mapValues(_.real)
+    val Y = mltMatDenMat(M, srft.mapValues(_.real)) // M * srft.mapValues(_.real)
 
     val q = qr.reduced.justQ(Y)
     q
