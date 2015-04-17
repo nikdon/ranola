@@ -9,7 +9,9 @@ import breeze.linalg.svd.{DenseSVD, SVD}
 import breeze.numerics._
 
 
-trait Decomposition[ResultType] {
+trait Decomposition {
+
+  type ResultType
 
   type AnyMatrix = Matrix[_]
   type OpMulMatrixDenseMatrix[Mat] = OpMulMatrix.Impl2[Mat, DenseMatrix[Double], DenseMatrix[Double]]
@@ -74,7 +76,9 @@ trait Decomposition[ResultType] {
 }
 
 
-object evdr extends Decomposition[DenseEigSym] {
+object evdr extends Decomposition {
+
+  type ResultType = DenseEigSym
 
   /** Direct randomized eigendecomposition */
   override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
@@ -82,7 +86,7 @@ object evdr extends Decomposition[DenseEigSym] {
                                                                   mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
                                                                   trans: CanTranspose[Mat, MatTrans],
                                                                   mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : DenseEigSym = {
+    : ResultType = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
@@ -112,7 +116,9 @@ object evdr extends Decomposition[DenseEigSym] {
 }
 
 
-object svdr extends Decomposition[DenseSVD] {
+object svdr extends Decomposition {
+
+  type ResultType = DenseSVD
 
   /** Direct randomized singular value decomposition */
   override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
@@ -121,7 +127,7 @@ object svdr extends Decomposition[DenseSVD] {
                                                                   trans: CanTranspose[Mat, MatTrans],
                                                                   mltTrans: OpMulMatrixDenseMatrix[MatTrans])
 
-    : DenseSVD = {
+    : ResultType = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
