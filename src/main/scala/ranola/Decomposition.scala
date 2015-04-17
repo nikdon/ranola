@@ -3,7 +3,6 @@ package ranola
 import breeze.linalg._
 import breeze.linalg.eig.Eig
 import breeze.linalg.eigSym.{DenseEigSym, EigSym}
-import breeze.linalg.operators.OpMulMatrix
 import breeze.linalg.support.CanTranspose
 import breeze.linalg.svd.{DenseSVD, SVD}
 import breeze.numerics._
@@ -13,11 +12,6 @@ trait Decomposition {
 
   type Result
 
-  type AnyMatrix = Matrix[_]
-  type OpMulMatrixDenseMatrix[Mat] = OpMulMatrix.Impl2[Mat, DenseMatrix[Double], DenseMatrix[Double]]
-  type OpMulDenseMatrixMatrix[Mat] = OpMulMatrix.Impl2[DenseMatrix[Double], Mat, DenseMatrix[Double]]
-  type OpMulMatrixDenseVector[Mat] = OpMulMatrix.Impl2[Mat, DenseVector[Double], DenseVector[Double]]
-
   /**
    * Abstract decomposition method
    *
@@ -26,51 +20,51 @@ trait Decomposition {
    * @param Q Orthonormal matrix of M
    * @return Result of decomposition
    */
-  def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
-                                                        (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                         mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                         trans: CanTranspose[Mat, MatTrans],
-                                                         mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : Result
+  def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+                                                (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                 mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                 trans: CanTranspose[M, MT],
+                                                 mltTrans: OpMulMatrixDenseMatrix[MT])
+  : Result
 
-  def generic[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, overSamples: Int)
-                                                      (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                       mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                       trans: CanTranspose[Mat, MatTrans],
-                                                       mltTrans: OpMulMatrixDenseMatrix[MatTrans]) = {
+  def generic[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, overSamples: Int)
+                                              (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                               mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                               trans: CanTranspose[M, MT],
+                                               mltTrans: OpMulMatrixDenseMatrix[MT]) = {
     decompose(M, k, GenericRangeFinder(M, sketchSize = k + overSamples))
   }
 
-  def fastGeneric[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, overSamples: Int)
-                                                          (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                           mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                           trans: CanTranspose[Mat, MatTrans],
-                                                           mltTrans: OpMulMatrixDenseMatrix[MatTrans]) = {
+  def fastGeneric[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, overSamples: Int)
+                                                  (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                   mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                   trans: CanTranspose[M, MT],
+                                                   mltTrans: OpMulMatrixDenseMatrix[MT]) = {
     decompose(M, k, FastGenericRangeFinder(M, sketchSize = k + overSamples))
   }
 
-  def powerIteration[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, nIter: Int, overSamples: Int)
-                                                             (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                              mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                              trans: CanTranspose[Mat, MatTrans],
-                                                              mltTrans: OpMulMatrixDenseMatrix[MatTrans]) = {
+  def powerIteration[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, nIter: Int, overSamples: Int)
+                                                     (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                      mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                      trans: CanTranspose[M, MT],
+                                                      mltTrans: OpMulMatrixDenseMatrix[MT]) = {
     decompose(M, k, PowerIterationRangeFinder(M, sketchSize = k + overSamples, nIter))
   }
 
-  def subspaceIteration[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, nIter: Int, overSamples: Int)
-                                                                (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                                 mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                                 trans: CanTranspose[Mat, MatTrans],
-                                                                 mltTrans: OpMulMatrixDenseMatrix[MatTrans]) = {
+  def subspaceIteration[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, nIter: Int, overSamples: Int)
+                                                        (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                         mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                         trans: CanTranspose[M, MT],
+                                                         mltTrans: OpMulMatrixDenseMatrix[MT]) = {
     decompose(M, k, SubspaceIterationRangeFinder(M, sketchSize = k + overSamples, nIter))
   }
 
-  def adaptive[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, tol: Double, maxIter: Int, overSamples: Int)
-                                                       (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                        mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                        trans: CanTranspose[Mat, MatTrans],
-                                                        mltTrans: OpMulMatrixDenseMatrix[MatTrans],
-                                                        mltMatDenVec: OpMulMatrixDenseVector[Mat]) = {
+  def adaptive[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, tol: Double, maxIter: Int, overSamples: Int)
+                                               (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                trans: CanTranspose[M, MT],
+                                                mltTrans: OpMulMatrixDenseMatrix[MT],
+                                                mltMatDenVec: OpMulMatrixDenseVector[M]) = {
     decompose(M, k, AdaptiveRangeFinder(M, nRandVec = k + overSamples, tol, maxIter))
   }
 }
@@ -81,12 +75,12 @@ object evdr extends Decomposition {
   type Result = DenseEigSym
 
   /** Direct randomized eigendecomposition */
-  override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
-                                                                 (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                                  mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                                  trans: CanTranspose[Mat, MatTrans],
-                                                                  mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : Result = {
+  override def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+                                                         (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                          mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                          trans: CanTranspose[M, MT],
+                                                          mltTrans: OpMulMatrixDenseMatrix[MT])
+  : Result = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
@@ -121,12 +115,12 @@ object svdr extends Decomposition {
   type Result = DenseSVD
 
   /** Direct randomized singular value decomposition */
-  override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
-                                                                 (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
-                                                                  mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
-                                                                  trans: CanTranspose[Mat, MatTrans],
-                                                                  mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : Result = {
+  override def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+                                                         (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
+                                                          mltDenMatMat: OpMulDenseMatrixMatrix[M],
+                                                          trans: CanTranspose[M, MT],
+                                                          mltTrans: OpMulMatrixDenseMatrix[MT])
+  : Result = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
