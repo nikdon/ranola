@@ -21,7 +21,7 @@ trait RandomizedRangeFinder {
    * @param sketchSize proposed sketch size that is second dimension of random matrix
    * @return Random matrix
    */
-  protected def drawRandomMatrix[Mat <: AnyMatrix](M: Mat, sketchSize: Int): DenseMatrix[Double] = {
+  protected def drawRandomMatrix(M: AnyMatrix, sketchSize: Int): DenseMatrix[Double] = {
     val n = checkAndGetSketchSize(M, sketchSize)
     val l = M.cols
     DenseMatrix.rand(l, n, rand = Rand.gaussian)
@@ -33,7 +33,7 @@ trait RandomizedRangeFinder {
    * @param s proposed sketch size
    * @return Correct sketch size
    */
-  protected def checkAndGetSketchSize[Mat <: AnyMatrix](M: Mat, s: Int): Int = {
+  protected def checkAndGetSketchSize(M: AnyMatrix, s: Int): Int = {
     if (s > M.rows) M.rows
     else s
   }
