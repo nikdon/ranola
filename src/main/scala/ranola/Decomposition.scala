@@ -11,7 +11,7 @@ import breeze.numerics._
 
 trait Decomposition {
 
-  type ResultType
+  type Result
 
   type AnyMatrix = Matrix[_]
   type OpMulMatrixDenseMatrix[Mat] = OpMulMatrix.Impl2[Mat, DenseMatrix[Double], DenseMatrix[Double]]
@@ -31,7 +31,7 @@ trait Decomposition {
                                                          mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
                                                          trans: CanTranspose[Mat, MatTrans],
                                                          mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : ResultType
+    : Result
 
   def generic[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, overSamples: Int)
                                                       (implicit mltMatDenMat: OpMulMatrixDenseMatrix[Mat],
@@ -78,7 +78,7 @@ trait Decomposition {
 
 object evdr extends Decomposition {
 
-  type ResultType = DenseEigSym
+  type Result = DenseEigSym
 
   /** Direct randomized eigendecomposition */
   override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
@@ -86,7 +86,7 @@ object evdr extends Decomposition {
                                                                   mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
                                                                   trans: CanTranspose[Mat, MatTrans],
                                                                   mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-    : ResultType = {
+    : Result = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
@@ -118,7 +118,7 @@ object evdr extends Decomposition {
 
 object svdr extends Decomposition {
 
-  type ResultType = DenseSVD
+  type Result = DenseSVD
 
   /** Direct randomized singular value decomposition */
   override def decompose[Mat <: AnyMatrix, MatTrans <: AnyMatrix](M: Mat, k: Int, Q: DenseMatrix[Double])
@@ -126,8 +126,7 @@ object svdr extends Decomposition {
                                                                   mltDenMatMat: OpMulDenseMatrixMatrix[Mat],
                                                                   trans: CanTranspose[Mat, MatTrans],
                                                                   mltTrans: OpMulMatrixDenseMatrix[MatTrans])
-
-    : ResultType = {
+    : Result = {
 
     require(k <= min(Q.rows, Q.cols), "min(Q.rows, Q.cols) should be less or equal to k")
 
