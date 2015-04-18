@@ -14,10 +14,10 @@ import breeze.signal.fourierTr
 object SRFT {
 
   def apply(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
-    getSRFTMatrix(n: Int, sketchSize: Int)
+    get(n: Int, sketchSize: Int)
   }
 
-  def getSRFTMatrix(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
+  def get(n: Int, sketchSize: Int): DenseMatrix[Complex] = {
     val d = D(n)
     val f = F(n)
     val r = R(n, sketchSize)
