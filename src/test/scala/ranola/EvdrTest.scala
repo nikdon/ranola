@@ -26,9 +26,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -41,9 +41,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -56,9 +56,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -71,9 +71,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -86,9 +86,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -105,9 +105,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -120,9 +120,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -135,9 +135,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -150,9 +150,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 
@@ -165,9 +165,9 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val idx = argsort(lambda)
 
-    idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+    idx.zipWithIndex.foreach { case (i, n) =>
+      lambda(i) should be(eigVals(n) +- 1E-6)
+      vectorsNearlyEqual(evs(::, i), eigVect(::, n), 1E-6)
     }
   }
 }
