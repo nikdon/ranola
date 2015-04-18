@@ -1,7 +1,7 @@
-import breeze.linalg.operators.OpMulMatrix
-import breeze.linalg.{DenseMatrix, DenseVector, Matrix}
-
 package object ranola {
+
+  import breeze.linalg.operators.OpMulMatrix
+  import breeze.linalg.{DenseMatrix, DenseVector, Matrix}
 
   type AnyMatrix = Matrix[_]
 
