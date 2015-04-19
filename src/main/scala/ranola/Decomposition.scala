@@ -59,7 +59,7 @@ trait Decomposition {
     decompose(M, k, SubspaceIterationRangeFinder(M, sketchSize = k + overSamples, nIter))
   }
 
-  def adaptive[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, tol: Double, maxIter: Int, overSamples: Int)
+  def adaptive[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, overSamples: Int, tol: Double, maxIter: Int)
                                                (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
                                                 mltDenMatMat: OpMulDenseMatrixMatrix[M],
                                                 trans: CanTranspose[M, MT],

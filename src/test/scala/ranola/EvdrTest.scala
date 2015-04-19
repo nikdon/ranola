@@ -52,7 +52,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
   }
 
   test("EVDR with Adaptive Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.adaptive(A_dense, k = 3, tol = 1E-3, maxIter = 3, overSamples = 0)
+    val EigSym(lambda, evs) = evdr.adaptive(A_dense, k = 3, overSamples = 0, tol = 1E-3, maxIter = 3)
     checkResults(lambda, evs)
   }
 
@@ -82,7 +82,7 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
   }
 
   test("Sparse EVDR with Adaptive Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.adaptive(A_sparse, k = 3, tol = 1E-3, maxIter = 3, overSamples = 0)
+    val EigSym(lambda, evs) = evdr.adaptive(A_sparse, k = 3, overSamples = 0, tol = 1E-3, maxIter = 3)
     checkResults(lambda, evs)
   }
 }

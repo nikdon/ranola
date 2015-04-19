@@ -98,7 +98,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     )
 
     val SVD(u, s, v) = svd.reduced(a)
-    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, tol = 1E-3, maxIter = 5, overSamples = 0)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, overSamples = 0, tol = 1E-3, maxIter = 5)
 
 
     vectorsNearlyEqual(s, sr)
@@ -124,7 +124,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     ).t
 
     val SVD(u, s, v) = svd.reduced(a)
-    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, tol = 1E-3, maxIter = 3, overSamples = 0)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k = a.rows min a.cols, overSamples = 0, tol = 1E-3, maxIter = 3)
 
 
     vectorsNearlyEqual(s, sr)
@@ -237,7 +237,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val k = 2
     val SVD(u, s, v) = svd(a, k, 1E-6)
-    val SVD(ur, sr, vr) = svdr.adaptive(a, k, tol = 1E-3, maxIter = 3, overSamples = 0)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k, overSamples = 0, tol = 1E-3, maxIter = 3)
 
     vectorsNearlyEqual(s, sr)
     matricesNearlyEqual(abs(u), abs(ur))
@@ -256,7 +256,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
     val k = 2
     val SVD(u, s, v) = svd(a, k, 1E-6)
-    val SVD(ur, sr, vr) = svdr.adaptive(a, k, tol = 1E-3, maxIter = 3, overSamples = 0)
+    val SVD(ur, sr, vr) = svdr.adaptive(a, k, overSamples = 0, tol = 1E-3, maxIter = 3)
 
     vectorsNearlyEqual(s, sr)
     matricesNearlyEqual(abs(u), abs(ur))

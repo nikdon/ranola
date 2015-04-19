@@ -38,17 +38,18 @@ At the moment the simplest direct scheme is implemented. It allows to ensure a m
       
       val EVD(l, v) = evdr.adaptive(
         M: Mat, 
-        k: Int, tol: Double, 
-        maxIter: Int, 
-        overSamples: Int
+        k: Int,
+        overSamples: Int,
+        tol: Double,
+        maxIter: Int
       )
       
       val SVD(u, s, v) = svdr.adaptive(
         M: Mat, 
-        k: Int, 
+        k: Int,
+        overSamples: Int,
         tol: Double, 
-        maxIter: Int, 
-        overSamples: Int
+        maxIter: Int
       )
       ```
 
