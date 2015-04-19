@@ -3,6 +3,7 @@ package object ranola {
   import breeze.linalg.operators.OpMulMatrix
   import breeze.linalg.{DenseMatrix, DenseVector, Matrix}
 
+  // View bound for type parameters
   type AnyMatrix = Matrix[_]
 
   // Multiplications
