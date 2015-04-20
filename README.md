@@ -1,7 +1,7 @@
 # ranola
 
 [![Build Status](https://travis-ci.org/nikdon/ranola.svg?branch=master)](https://travis-ci.org/nikdon/ranola)
-[![Codacy Badge](https://www.codacy.com/project/badge/134576e1957c4cd8a8cf1755bd839e71)](https://www.codacy.com/app/nd/ranola_2)
+[![Codacy Badge](https://www.codacy.com/project/badge/134576e1957c4cd8a8cf1755bd839e71)](https://www.codacy.com/app/nd/ranola)
 
 **ranola** is a library for low-rank matrix approximations by randomized algorithms (Randomized Numerical Linear Algebra aka RandNLA). Compared with standard deterministic algorithms, the randomized methods are often faster and produce accurate results. Empirical results show that a corresponding implementation can be faster than LAPACK on dense matrices.
 
