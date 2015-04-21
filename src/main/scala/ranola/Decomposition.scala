@@ -20,7 +20,7 @@ trait Decomposition {
    * @param Q Orthonormal matrix of M
    * @return Result of decomposition
    */
-  def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+  protected def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
                                                 (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
                                                  mltDenMatMat: OpMulDenseMatrixMatrix[M],
                                                  trans: CanTranspose[M, MT],
@@ -75,7 +75,7 @@ object evdr extends Decomposition {
   type Result = DenseEigSym
 
   /** Direct randomized eigendecomposition */
-  override def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+  override protected def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
                                                          (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
                                                           mltDenMatMat: OpMulDenseMatrixMatrix[M],
                                                           trans: CanTranspose[M, MT],
@@ -115,7 +115,7 @@ object svdr extends Decomposition {
   type Result = DenseSVD
 
   /** Direct randomized singular value decomposition */
-  override def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
+  override protected def decompose[M <: AnyMatrix, MT <: AnyMatrix](M: M, k: Int, Q: DenseMatrix[Double])
                                                          (implicit mltMatDenMat: OpMulMatrixDenseMatrix[M],
                                                           mltDenMatMat: OpMulDenseMatrixMatrix[M],
                                                           trans: CanTranspose[M, MT],
