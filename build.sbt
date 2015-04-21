@@ -4,6 +4,8 @@ version := "0.1.0"
 
 scalaVersion := "2.11.5"
 
+licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
+
 libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze" % "0.11.2",
   "org.scalanlp" %% "breeze-natives" % "0.11.2",
