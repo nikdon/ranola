@@ -15,11 +15,12 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
   val A_sparse = CSCMatrix((9.0, 0.0, 0.0), (0.0, 82.0, 0.0), (0.0, 0.0, 25.0))
   val A_dense = A_sparse.toDense
-  val eigVals = DenseVector(9.0, 25.0, 82.0)
-  val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
   
   def checkResults(evals: DenseVector[Double], evect: DenseMatrix[Double]): Unit = {
     val idx = argsort(evals)
+
+    val eigVals = DenseVector(9.0, 25.0, 82.0)
+    val eigVect = DenseMatrix((1.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
 
     idx.zipWithIndex.foreach { case (i, n) =>
       evals(i) should be(eigVals(n) +- 1E-6)
