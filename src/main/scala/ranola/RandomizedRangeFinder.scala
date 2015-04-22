@@ -199,7 +199,7 @@ object SubspaceIterationRangeFinder extends RandomizedRangeFinder {
                                              mltTrans: OpMulMatrixDenseMatrix[MT])
   : DenseMatrix[Double] = {
 
-    val qi = DenseMatrix.zeros[Double](M.rows, min(M.cols, M.rows))
+    val qi = DenseMatrix.zeros[Double](M.rows, min(M.cols, M.rows) min sketchSize)
 
     val R = drawRandomMatrix(M, sketchSize)
     val Y = mltMatDenMat(M, R) // M * R
