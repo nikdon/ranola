@@ -82,8 +82,7 @@ object PowerIterationRangeFinder extends RandomizedRangeFinder {
       i += 1
     }
 
-    val q = qr.reduced.justQ(Y)
-    q
+    qr.reduced.justQ(Y)
   }
 }
 
@@ -243,7 +242,6 @@ object FastGenericRangeFinder extends RandomizedRangeFinder {
     // or [[doi:10.1016/j.acha.2007.12.002]]
     val Y = mltMatDenMat(M, srft.mapValues(_.real)) // M * srft.mapValues(_.real)
 
-    val q = qr.reduced.justQ(Y)
-    q
+    qr.reduced.justQ(Y)
   }
 }
