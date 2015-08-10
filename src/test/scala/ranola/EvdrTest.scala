@@ -4,18 +4,19 @@ package ranola
 import breeze.linalg.eigSym.EigSym
 import breeze.linalg.{CSCMatrix, DenseMatrix, DenseVector, argsort}
 import breeze.util.DoubleImplicits
-import org.junit.runner.RunWith
 import org.scalatest._
-import org.scalatest.junit._
-import ranola.TestHelpers._
 
 
-@RunWith(classOf[JUnitRunner])
 class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
 
   val A_sparse = CSCMatrix((9.0, 0.0, 0.0), (0.0, 82.0, 0.0), (0.0, 0.0, 25.0))
   val A_dense = A_sparse.toDense
-  
+
+  def vectorsNearlyEqual(A: DenseVector[Double], B: DenseVector[Double], threshold: Double = 1E-6): Unit = {
+    for (i <- 0 until A.length)
+      A(i) should be(B(i) +- threshold)
+  }
+
   def checkResults(evals: DenseVector[Double], evect: DenseMatrix[Double]): Unit = {
     val idx = argsort(evals)
 
@@ -28,62 +29,8 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  ///////////////////////
-  // DENSE
-  ///////////////////////
-
-  test("EVDR with Generic Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.generic(A_dense, k = 3, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("EVDR with Fast Generic Range Finder") {
-    val EigSym(lambda, evs) = evdr.fastGeneric(A_dense, k = 3, overSamples = 0)
-    checkResults(lambda, evs)
-  }
-
   test("EVDR with Power Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.powerIteration(A_dense, k = 3, nIter = 5, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("EVDR with Subspace Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.subspaceIteration(A_dense, k = 3, nIter = 5, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("EVDR with Adaptive Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.adaptive(A_dense, k = 3, overSamples = 0, tol = 1E-3, maxIter = 3)
-    checkResults(lambda, evs)
-  }
-
-  
-  ///////////////////////
-  // SPARSE
-  ///////////////////////
-
-  test("Sparse EVDR with Generic Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.generic(A_sparse, k = 3, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("Sparse EVDR with Fast Generic Range Finder") {
-    val EigSym(lambda, evs) = evdr.fastGeneric(A_sparse, k = 3, overSamples = 0)
-    checkResults(lambda, evs)
-  }
-
-  test("Sparse EVDR with Power Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.powerIteration(A_sparse, k = 3, nIter = 5, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("Sparse EVDR with Subspace Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.subspaceIteration(A_sparse, k = 3, nIter = 5, overSamples = 2)
-    checkResults(lambda, evs)
-  }
-
-  test("Sparse EVDR with Adaptive Iteration Randomized Range Finder") {
-    val EigSym(lambda, evs) = evdr.adaptive(A_sparse, k = 3, overSamples = 0, tol = 1E-3, maxIter = 3)
+    val EigSym(lambda, evs) = EVDR.viaPowerIteration(A_dense, k = 3, nIter = 5, overSamples = 2)
     checkResults(lambda, evs)
   }
 }
