@@ -29,7 +29,7 @@ object PowerIterationRangeFinder extends RandomizedRangeFinder {
       i += 1
     }
 
-    val (_q, _) = op.QR(A)
+    val (_q, _) = op.QR(Y)
     _q
   }
 }
