@@ -41,11 +41,22 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("SVD and SVDR with Power Iteration Randomized Range Finder") {
+  test("SVD and SVDR via Generic Randomized Range Finder") {
     for (m <- List(A_dense, A_dense.t)) {
       val SVD(u, s, v) = svd.reduced(m)
-      val SVD(ur, sr, vr) = SVDR.viaPowerIteration(m, k = m.rows min m.cols, nIter = 5, overSamples = 1)
+      val SVD(ur, sr, vr) = SVDR.generic(m, k = m.rows min m.cols, nOverSamples = 1)
 
+      vectorsNearlyEqual(s, sr)
+      matricesNearlyEqual(abs(u), abs(ur))
+      matricesNearlyEqual(abs(v), abs(vr))
+      matricesNearlyEqual(m, ur * diag(sr) * vr)
+    }
+  }
+
+  test("SVD and SVDR via Power Iteration Randomized Range Finder") {
+    for (m <- List(A_dense, A_dense.t)) {
+      val SVD(u, s, v) = svd.reduced(m)
+      val SVD(ur, sr, vr) = SVDR.viaPowerIteration(m, k = m.rows min m.cols, nIter = 5, nOverSamples = 1)
 
       vectorsNearlyEqual(s, sr)
       matricesNearlyEqual(abs(u), abs(ur))

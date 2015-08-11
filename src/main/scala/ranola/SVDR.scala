@@ -30,10 +30,16 @@ trait SVDR[N, M[_], V[_], R] extends Decomposition[N, M, V, R] {
 
 object SVDR {
 
-  def viaPowerIteration[N, M[_], V[_], R](A: M[N], k: Int, nIter: Int, overSamples: Int)
+  def generic[N, M[_], V[_], R](A: M[N], k: Int, nOverSamples: Int)
+                               (implicit dec: SVDR[N, M, V, R],
+                                op: MatrixOps[N, M, V]) = {
+    dec.generic(A, k, nOverSamples)
+  }
+
+  def viaPowerIteration[N, M[_], V[_], R](A: M[N], k: Int, nIter: Int, nOverSamples: Int)
                                          (implicit dec: SVDR[N, M, V, R],
                                           op: MatrixOps[N, M, V]) = {
-    dec.viaPowerIteration(A, k, nIter, overSamples)
+    dec.viaPowerIteration(A, k, nIter, nOverSamples)
   }
 
   ///////////////////////////////////
