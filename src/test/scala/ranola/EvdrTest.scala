@@ -5,6 +5,7 @@ import breeze.linalg.eigSym.EigSym
 import breeze.linalg.{CSCMatrix, DenseMatrix, DenseVector, argsort}
 import breeze.util.DoubleImplicits
 import org.scalatest._
+import ranola.EVDR.Implicits._
 
 
 class EvdrTest extends FunSuite with Matchers with DoubleImplicits {

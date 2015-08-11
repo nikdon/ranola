@@ -20,7 +20,7 @@ trait Decomposition[N, M[_], V[_], R] {
    * @param op  Matrix operations
    * @return    A result of decomposition
    */
-  protected[this] def decompose(A: M[N], k: Int, Q: M[N])(implicit op: MatrixOps[N, M, V]): R
+  protected [this] def decompose(A: M[N], k: Int, Q: M[N])(implicit op: MatrixOps[N, M, V]): R
 
   def generic(A: M[N], k: Int, nOverSamples: Int)(implicit op: MatrixOps[N, M, V]): R = {
     val Q = GenericRangeFinder(A, sketchSize = k + nOverSamples)

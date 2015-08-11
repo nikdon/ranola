@@ -6,6 +6,7 @@ import breeze.linalg.svd.SVD
 import breeze.numerics.abs
 import breeze.util.DoubleImplicits
 import org.scalatest._
+import ranola.SVDR.Implicits._
 
 
 class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
