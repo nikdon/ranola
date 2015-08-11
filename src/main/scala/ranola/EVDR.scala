@@ -10,13 +10,19 @@ import breeze.numerics._
  * Trait that describes eigenvalue decomposition in terms of randomized algorithms
  * Contains the only one function that resolves sign ambiguity
  *
- * @tparam N The type og values inside matrix and vector containers
+ * @tparam N The type of values inside matrix and vector containers
  * @tparam M The matrix container
  * @tparam V The vector container
  */
 trait EVDR[N, M[_], V[_], R] extends Decomposition[N, M, V, R] {
 
-  /** Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive */
+  /**
+   * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive
+   *
+   * @param u   Singular vectors
+   * @param op  Matrix operations
+   * @return    Singular vectors with resolved sign ambiguity
+   */
   def flipEVDSigns(u: M[N])(implicit op: MatrixOps[N, M, V]): M[N]
 }
 
