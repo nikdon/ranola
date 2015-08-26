@@ -22,6 +22,17 @@ trait Decomposition[N, M[_], V[_], R] {
    */
   protected [this] def decompose(A: M[N], k: Int, Q: M[N])(implicit op: MatrixOps[N, M, V]): R
 
+  /**
+   * Algorithm 4.1 of "Finding structure with randomness:
+   * Stochastic algorithms for constructing approximate matrix decompositions"
+   * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
+   *
+   * @param A             The input data matrix
+   * @param k             The number of entries in result
+   * @param nOverSamples  The number of oversamples
+   * @param op            The matrix operations (ex: multiplication etc.)
+   * @return              A decomposition result
+   */
   def generic(A: M[N], k: Int, nOverSamples: Int)(implicit op: MatrixOps[N, M, V]): R = {
     val Q = GenericRangeFinder(A, sketchSize = k + nOverSamples)
     decompose(A, k, Q)
@@ -32,10 +43,12 @@ trait Decomposition[N, M[_], V[_], R] {
    * Stochastic algorithms for constructing approximate matrix decompositions"
    * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
    *
-   * @param A     The input data matrix
-   * @param k     The number of entries in result
-   * @param nIter Number of iterations to stabilize the result
-   * @return      A decomposition result
+   * @param A             The input data matrix
+   * @param k             The number of entries in result
+   * @param nIter         Number of iterations to stabilize the result
+   * @param nOverSamples  The number of oversamples
+   * @param op            The matrix operations (ex: multiplication etc.)
+   * @return              A decomposition result
    */
   def viaPowerIteration(A: M[N], k: Int, nIter: Int, nOverSamples: Int)(implicit op: MatrixOps[N, M, V]): R = {
     val Q = PowerIterationRangeFinder(A, sketchSize = k + nOverSamples, nIter)
