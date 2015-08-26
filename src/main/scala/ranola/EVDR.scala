@@ -13,9 +13,14 @@ object EVDR {
     dec.generic(A, k, nOverSamples)
   }
 
-  def viaPowerIteration[N, M[_], V[_], R](A: M[N], k: Int, nIter: Int, nOverSamples: Int)
+  def viaPowerIterations[N, M[_], V[_], R](A: M[N], k: Int, nIter: Int, nOverSamples: Int)
                                          (implicit dec: Decomposition[N, M, V, R], op: MatrixOps[N, M, V]) = {
-    dec.viaPowerIteration(A, k, nIter, nOverSamples)
+    dec.viaPowerIterations(A, k, nIter, nOverSamples)
+  }
+
+  def viaSubspaceIterations[N, M[_], V[_], R](A: M[N], k: Int, nIter: Int, nOverSamples: Int)
+                                         (implicit dec: Decomposition[N, M, V, R], op: MatrixOps[N, M, V]) = {
+    dec.viaSubspaceIterations(A, k, nIter, nOverSamples)
   }
 
 

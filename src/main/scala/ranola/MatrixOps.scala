@@ -27,8 +27,11 @@ trait MatrixOps[N, M[_], V[_]] {
   /** Matrix transpose */
   def t(A: M[N]): M[N]
 
-  /** Create new matrix filled with random values */
+  /** Create a new matrix filled with random values */
   def drawRandomMatrix(A: M[N], sketchSize: Int): M[N]
+
+  /** Create a new matrix filled with zeros */
+  def drawZerosMatrix(nRow: Int, nCol: Int): M[N]
 
   /** Check size of the given matrix and return an appropriate sketch size */
   protected [this] def checkAndGetSketchSize(A: M[N], s: Int): Int = if (s > getRows(A)) getRows(A) else s
@@ -59,6 +62,8 @@ object MatrixOps {
       val l = getCols(A)
       DenseMatrix.rand(l, n, rand = Rand.gaussian)
     }
+
+    override def drawZerosMatrix(nRow: Int, nCol: Int) = DenseMatrix.zeros[Double](nRow, nCol)
 
     override def QR(A: DenseMatrix[Double]) = {
       val QR(_q, _r) = qr.reduced(A)
