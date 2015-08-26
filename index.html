@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ranola by nikdon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Ranola</h1>
+      <h2 class="project-tagline">Randomized Numerical Linear Algebra for Scala</h2>
+      <a href="https://github.com/nikdon/ranola" class="btn">View on GitHub</a>
+      <a href="https://github.com/nikdon/ranola/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/nikdon/ranola/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="ranola" class="anchor" href="#ranola" aria-hidden="true"><span class="octicon octicon-link"></span></a>ranola</h1>
+
+<p><a href="https://travis-ci.org/nikdon/ranola"><img src="https://travis-ci.org/nikdon/ranola.svg?branch=master" alt="Build Status"></a>
+<a href="https://www.codacy.com/app/nd/ranola"><img src="https://www.codacy.com/project/badge/134576e1957c4cd8a8cf1755bd839e71" alt="Codacy Badge"></a>
+<a href="https://bintray.com/nikdon/ranola/ranola/_latestVersion"> <img src="https://api.bintray.com/packages/nikdon/ranola/ranola/images/download.svg" alt="Download"> </a></p>
+
+<p><strong>ranola</strong> is a library for low-rank matrix approximations by randomized algorithms (Randomized Numerical Linear Algebra aka RandNLA). Compared with standard deterministic algorithms, the randomized methods are often faster and produce accurate results. Empirical results show that a corresponding implementation can be faster than LAPACK on dense matrices.</p>
+
+<p>At the moment the simplest direct scheme is implemented. It allows to ensure a minimal error in the final approximation of decompositions:</p>
+
+<ul>
+<li>Singular value decomposition</li>
+<li>Eigen value decomposition</li>
+</ul>
+
+<h2>
+<a id="randomized-schemes" class="anchor" href="#randomized-schemes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Randomized schemes</h2>
+
+<ol>
+<li>
+<p>Generic scheme (<a href="http://arxiv.org/pdf/0909.4061">§4.1</a>) is designed for solving the fixed-rank problem, where the target rank of the input matrix is specified in advance. This algorithm works well for matrices whose singular values exhibit some decay, but they may produce a poor basis when the input matrix has a flat singular spectrum or when the input matrix is very large.</p>
+
+<div class="highlight highlight-scala"><pre>  <span class="pl-k">val</span> <span class="pl-en">EigSym</span>(lambda, evs) <span class="pl-k">=</span> <span class="pl-en">EVDR</span>.generic(<span class="pl-en">A_dense</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">2</span>)
+
+  <span class="pl-k">val</span> <span class="pl-en">SVD</span>(ur, sr, vr) <span class="pl-k">=</span> <span class="pl-en">SVDR</span>.generic(<span class="pl-en">M</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">10</span>)</pre></div>
+</li>
+<li>
+<p>Adaptive scheme (<a href="http://arxiv.org/pdf/0909.4061">§4.2</a>) can handle the fixed-precision problem with predifined computational tolerance. The CPU time requirements of schemes 1 and 2 are essentially identical.</p>
+
+<div class="highlight highlight-scala"><pre>  not implemented in v <span class="pl-c1">0.2.0</span></pre></div>
+</li>
+<li>
+<p>Power Iteration scheme (<a href="http://arxiv.org/pdf/0909.4061">§4.3</a>) requires <code>2*nIter + 1</code> times as many matrix–vector multiplies as scheme 1, but is far more accurate in situations where the singular values of matrix to decompose decay slowly. Scheme 3 targets the fixed-rank problem. In situations where it is critical to achieve nearoptimal approximation errors, one can increase the oversampling beyond standard recommendation <code>overSamples = 5</code> all the way to <code>overSamples = k</code> without changing the scaling of the asymptotic computational cost. This procedure is vulnerable to round-off errors. The recommended implementation appears as scheme 4.</p>
+
+<div class="highlight highlight-scala"><pre>  <span class="pl-k">val</span> <span class="pl-en">SVD</span>(ur, sr, vr) <span class="pl-k">=</span> <span class="pl-en">SVDR</span>.viaPowerIteration(<span class="pl-en">M</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nIter <span class="pl-k">=</span> <span class="pl-c1">5</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">2</span>)
+
+  <span class="pl-k">val</span> <span class="pl-en">EigSym</span>(lambda, evs) <span class="pl-k">=</span> <span class="pl-en">EVDR</span>.viaPowerIteration(<span class="pl-en">M</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nIter <span class="pl-k">=</span> <span class="pl-c1">5</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">2</span>)</pre></div>
+</li>
+<li>
+<p>Subspace Iteration scheme (<a href="http://arxiv.org/pdf/0909.4061">§4.4</a>) is designed for solving the fixed-rank problem, where the target rank of the input matrix is specified in advance. This procedure is invulnerable to round-off errors in opposite to Power Iteration algorithm (<a href="http://arxiv.org/pdf/0909.4061">§4.3</a>).</p>
+
+<div class="highlight highlight-scala"><pre>  <span class="pl-k">val</span> <span class="pl-en">SVD</span>(ur, sr, vr) <span class="pl-k">=</span> <span class="pl-en">SVDR</span>.viaSubspaceIterations(<span class="pl-en">M</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nIter <span class="pl-k">=</span> <span class="pl-c1">5</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">2</span>)
+
+  <span class="pl-k">val</span> <span class="pl-en">EigSym</span>(lambda, evs) <span class="pl-k">=</span> <span class="pl-en">EVDR</span>.viaSubspaceIterations(<span class="pl-en">M</span>, k <span class="pl-k">=</span> <span class="pl-c1">3</span>, nIter <span class="pl-k">=</span> <span class="pl-c1">5</span>, nOverSamples <span class="pl-k">=</span> <span class="pl-c1">2</span>)</pre></div>
+</li>
+<li>
+<p>Fast Generic scheme (<a href="http://arxiv.org/pdf/0909.4061">§4.5</a>) uses subsampled random Fourier transform (SRFT) that can be used to identify a nearoptimal basis for a rank-k matrix using l = (k + log(M.cols)) log(k) samples (<code>overSamples = (k + log(M.cols)) log(k) - k</code>). In practice, setting <code>overSamples = 10</code> or <code>overSamples = 20</code> is typically more than adequate. It allows to compute an approximate rank-(l) factorization of a general dense m-by-n matrix in roughly O(mn log(k + overSamples)) flops.</p>
+
+<pre><code>  not implemented in v 0.2.0
+</code></pre>
+</li>
+</ol>
+
+<h2>
+<a id="number-of-oversamples" class="anchor" href="#number-of-oversamples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Number of oversamples</h2>
+
+<p>Number of oversamples depends on:</p>
+
+<ul>
+<li><p><strong>Matrix dimensions</strong>. Very large matrices may require more oversampling.</p></li>
+<li><p><strong>Singular spectrum</strong>. The more rapid the decay of the singular values, the less oversampling is needed. In the extreme case that the matrix has exact rank <strong>k</strong>, it is not necessary to oversample.</p></li>
+<li><p><strong>Random test matrix</strong>. Gaussian matrices succeed with very little oversampling, such as <code>overSamples = 5</code> or <code>overSamples = 10</code>. There is rarely any advantage to select <strong>overSamples</strong> &gt; <strong>k</strong>.</p></li>
+</ul>
+
+<h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h2>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/nikdon/ranola">Ranola</a> is maintained by <a href="https://github.com/nikdon">nikdon</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
