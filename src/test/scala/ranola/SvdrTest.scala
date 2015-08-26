@@ -42,7 +42,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("SVD and SVDR via Generic Randomized Range Finder") {
+  test("SVDR via Generic scheme") {
     for (m <- List(A_dense, A_dense.t)) {
       val SVD(u, s, v) = svd.reduced(m)
       val SVD(ur, sr, vr) = SVDR.generic(m, k = m.rows min m.cols, nOverSamples = 1)
@@ -54,7 +54,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("SVD and SVDR via Power Iterations Randomized Range Finder") {
+  test("SVDR via Power Iterations") {
     for (m <- List(A_dense, A_dense.t)) {
       val SVD(u, s, v) = svd.reduced(m)
       val SVD(ur, sr, vr) = SVDR.viaPowerIteration(m, k = m.rows min m.cols, nIter = 5, nOverSamples = 1)
@@ -66,7 +66,7 @@ class SvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("SVD and SVDR via Subspace Iterations Randomized Range Finder") {
+  test("SVDR via Subspace Iterations") {
     for (m <- List(A_dense, A_dense.t)) {
       val SVD(u, s, v) = svd.reduced(m)
       val SVD(ur, sr, vr) = SVDR.viaSubspaceIterations(m, k = m.rows min m.cols, nIter = 5, nOverSamples = 1)
