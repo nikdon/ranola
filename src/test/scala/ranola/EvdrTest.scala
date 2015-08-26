@@ -30,17 +30,17 @@ class EvdrTest extends FunSuite with Matchers with DoubleImplicits {
     }
   }
 
-  test("EVDR via Generic Randomized Range Finder") {
+  test("EVDR via Generic scheme") {
     val EigSym(lambda, evs) = EVDR.generic(A_dense, k = 3, nOverSamples = 2)
     checkResults(lambda, evs)
   }
 
-  test("EVDR via Power Iterations Randomized Range Finder") {
+  test("EVDR via Power Iterations") {
     val EigSym(lambda, evs) = EVDR.viaPowerIterations(A_dense, k = 3, nIter = 5, nOverSamples = 2)
     checkResults(lambda, evs)
   }
 
-  test("EVDR via Subspace Iterations Randomized Range Finder") {
+  test("EVDR via Subspace Iterations") {
     val EigSym(lambda, evs) = EVDR.viaSubspaceIterations(A_dense, k = 3, nIter = 5, nOverSamples = 2)
     checkResults(lambda, evs)
   }
