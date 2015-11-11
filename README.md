@@ -11,6 +11,33 @@ At the moment the simplest direct scheme is implemented. It allows to ensure a m
 - Singular value decomposition
 - Eigen value decomposition
 
+## Getting ranola
+
+If you're using SBT, add the following line to your build file:
+
+```scala
+resolvers += "jitpack" at "https://jitpack.io"
+
+libraryDependencies += "com.github.nikdon" % "ranola" % "v0.1.0"
+
+```
+    
+For Maven:
+
+```maven
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.nikdon</groupId>
+    <artifactId>ranola</artifactId>
+    <version>v0.1.0</version>
+</dependency>
+
+```
+
 ##  Randomized schemes
 
 1. Generic scheme ([§4.1][1]) is designed for solving the fixed-rank problem, where the target rank of the input matrix is specified in advance. This algorithm works well for matrices whose singular values exhibit some decay, but they may produce a poor basis when the input matrix has a flat singular spectrum or when the input matrix is very large.

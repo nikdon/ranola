@@ -6,8 +6,6 @@ scalaVersion := "2.11.7"
 
 licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
 
-libraryDependencies += "org.spire-math" % "spire_2.11" % "0.10.1"
-
 libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze" % "0.11.2",
   "org.scalanlp" %% "breeze-natives" % "0.11.2",
