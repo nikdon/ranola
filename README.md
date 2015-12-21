@@ -18,7 +18,7 @@ If you're using SBT, add the following line to your build file:
 ```scala
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.nikdon" % "ranola" % "v0.1.0"
+libraryDependencies += "com.github.nikdon" % "ranola" % "v0.2.0"
 
 ```
     
@@ -33,7 +33,7 @@ For Maven:
 <dependency>
     <groupId>com.github.nikdon</groupId>
     <artifactId>ranola</artifactId>
-    <version>v0.1.0</version>
+    <version>v0.2.0</version>
 </dependency>
 
 ```
