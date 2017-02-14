@@ -125,3 +125,5 @@ import ranola.SVDR.Implicits._
 And that is it, enjoy.
 
 [1]: http://arxiv.org/pdf/0909.4061
+
+[![Analytics](https://ga-beacon.appspot.com/UA-91956314-1/ranola/readme?pixel)](https://github.com/igrigorik/ga-beacon)
